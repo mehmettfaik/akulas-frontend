@@ -6,7 +6,7 @@ export const SettingsPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Ayarlar</h1>
+        <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-6">Ayarlar</h1>
         
         <Card title="Sistem Ayarları">
           <p className="text-gray-600">

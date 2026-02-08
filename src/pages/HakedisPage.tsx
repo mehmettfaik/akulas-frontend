@@ -100,7 +100,7 @@ export const HakedisPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Hakediş Hazırla</h1>
+        <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-6">Hakediş Hazırla</h1>
 
         {message && (
           <div

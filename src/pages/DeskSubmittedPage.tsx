@@ -125,7 +125,7 @@ export const DeskSubmittedPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Sorumluya Teslim Edilen Bilgiler</h1>
+        <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-6">Sorumluya Teslim Edilen Bilgiler</h1>
 
         {/* Filtre */}
         <Card title="Filtrele" className="mb-6">
@@ -266,8 +266,8 @@ export const DeskSubmittedPage: React.FC = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
+                  <h2 className="text-lg md:text-2xl font-bold">
                     {selectedRecord.recordType === 'desk' ? 'Desk' : 'Bayi Dolum'} Kayıt Detayı - {new Date(selectedRecord.date).toLocaleDateString('tr-TR')}
                   </h2>
                   <button
@@ -636,23 +636,23 @@ export const DeskSubmittedPage: React.FC = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div className="bg-blue-100 p-4 rounded">
                         <p className="text-sm text-gray-700">Toplam Satış</p>
-                        <p className="text-2xl font-bold text-blue-700">₺{selectedRecord.totals.totalSales.toFixed(2)}</p>
+                        <p className="text-lg md:text-2xl font-bold text-blue-700">₺{selectedRecord.totals.totalSales.toFixed(2)}</p>
                       </div>
                       <div className="bg-orange-100 p-4 rounded">
                         <p className="text-sm text-gray-700">Kredi Kartı</p>
-                        <p className="text-2xl font-bold text-orange-700">₺{selectedRecord.totals.totalCreditCard.toFixed(2)}</p>
+                        <p className="text-lg md:text-2xl font-bold text-orange-700">₺{selectedRecord.totals.totalCreditCard.toFixed(2)}</p>
                       </div>
                       <div className="bg-green-100 p-4 rounded">
                         <p className="text-sm text-gray-700">Nakit</p>
-                        <p className="text-2xl font-bold text-green-700">₺{selectedRecord.totals.totalCash.toFixed(2)}</p>
+                        <p className="text-lg md:text-2xl font-bold text-green-700">₺{selectedRecord.totals.totalCash.toFixed(2)}</p>
                       </div>
                       <div className="bg-purple-100 p-4 rounded">
                         <p className="text-sm text-gray-700">Kasada Kalan</p>
-                        <p className="text-2xl font-bold text-purple-700">₺{selectedRecord.totals.cashInRegister.toFixed(2)}</p>
+                        <p className="text-lg md:text-2xl font-bold text-purple-700">₺{selectedRecord.totals.cashInRegister.toFixed(2)}</p>
                       </div>
                       <div className={`p-4 rounded ${selectedRecord.totals.difference >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
                         <p className="text-sm text-gray-700">Fark</p>
-                        <p className={`text-2xl font-bold ${selectedRecord.totals.difference >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                        <p className={`text-lg md:text-2xl font-bold ${selectedRecord.totals.difference >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                           ₺{selectedRecord.totals.difference.toFixed(2)}
                         </p>
                       </div>
@@ -661,7 +661,7 @@ export const DeskSubmittedPage: React.FC = () => {
 
                   {/* Durum */}
                   <div className="border-t-2 border-gray-300 pt-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                       <div>
                         <p className="text-sm text-gray-600">Teslim Eden</p>
                         <p className="text-lg font-semibold">{selectedRecord.submittedBy}</p>
@@ -729,7 +729,7 @@ export const DeskSubmittedPage: React.FC = () => {
                           onChange={(e) => setReviewNotes(e.target.value)}
                         />
                       </div>
-                      <div className="flex gap-3">
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           onClick={() => handleReview(selectedRecord.id, 'approve')}
                           className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors"

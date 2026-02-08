@@ -114,7 +114,7 @@ export const HomePage: React.FC = () => {
     <MainLayout>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-2">
             Hoş Geldiniz, {user?.displayName}!
           </h1>
           <p className="text-gray-600">
@@ -132,10 +132,10 @@ export const HomePage: React.FC = () => {
                 className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1 border border-gray-200 overflow-hidden"
               >
                 <div className={`${page.color} h-2`}></div>
-                <div className="p-6">
+                <div className="p-4 md:p-6">
                   <div className="flex items-center mb-4">
                     <div className={`${page.color} bg-opacity-10 p-3 rounded-lg`}>
-                      <Icon className={`w-8 h-8 ${page.color.replace('bg-', 'text-')}`} />
+                      <Icon className={`w-6 h-6 md:w-8 md:h-8 ${page.color.replace('bg-', 'text-')}`} />
                     </div>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">

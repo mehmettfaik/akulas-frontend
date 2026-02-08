@@ -28,28 +28,28 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <Fragment>
       <div className="fixed inset-0 z-50 overflow-y-auto">
-        <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="flex min-h-screen items-end sm:items-center justify-center p-0 sm:p-4">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
             onClick={onClose}
           />
-          
+
           {/* Modal */}
-          <div className={`relative bg-white rounded-lg shadow-xl ${sizeClasses[size]} w-full`}>
+          <div className={`relative bg-white sm:rounded-lg shadow-xl ${sizeClasses[size]} w-full max-h-[100vh] sm:max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-lg`}>
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+            <div className="sticky top-0 bg-white z-10 flex items-center justify-between p-4 md:p-6 border-b border-gray-200">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 pr-8">{title}</h3>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-500 transition-colors"
+                className="absolute right-4 top-4 md:right-6 md:top-6 text-gray-400 hover:text-gray-500 transition-colors p-1"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
-            
+
             {/* Content */}
-            <div className="p-6">{children}</div>
+            <div className="p-4 md:p-6">{children}</div>
           </div>
         </div>
       </div>

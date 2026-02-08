@@ -95,7 +95,7 @@ export const ReportsPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Raporlar</h1>
+        <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-6">Raporlar</h1>
 
         {/* Filter Section */}
         <Card title="Filtrele">
@@ -236,19 +236,19 @@ export const ReportsPage: React.FC = () => {
               </div>
               <div className="bg-green-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Toplam Hakediş</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-lg md:text-2xl font-bold text-green-600">
                   ₺{vehicleReport.summary.totalAmount.toFixed(2)}
                 </p>
               </div>
               <div className="bg-purple-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Hat Bazlı</p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-lg md:text-2xl font-bold text-purple-600">
                   ₺{vehicleReport.summary.totalRouteAmount.toFixed(2)}
                 </p>
               </div>
               <div className="bg-orange-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Kredi Kartı</p>
-                <p className="text-2xl font-bold text-orange-600">
+                <p className="text-lg md:text-2xl font-bold text-orange-600">
                   ₺{vehicleReport.summary.totalVehicleAmount.toFixed(2)}
                 </p>
               </div>
@@ -320,29 +320,29 @@ export const ReportsPage: React.FC = () => {
         {routeReport && (
           <Card title="Hat Raporu" className="mt-6">
             <div className="mb-6">
-              <h3 className="text-xl font-bold mb-4">{routeReport.routeName} Hattı</h3>
+              <h3 className="text-base md:text-xl font-bold mb-4">{routeReport.routeName} Hattı</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Toplam Hakediş</p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-lg md:text-2xl font-bold text-green-600">
                     ₺{routeReport.summary.totalAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Hat Bazlı</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-lg md:text-2xl font-bold text-purple-600">
                     ₺{routeReport.summary.totalRouteAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="bg-orange-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Kredi Kartı</p>
-                  <p className="text-2xl font-bold text-orange-600">
+                  <p className="text-lg md:text-2xl font-bold text-orange-600">
                     ₺{routeReport.summary.totalVehicleAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Araç Sayısı</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-lg md:text-2xl font-bold text-blue-600">
                     {routeReport.summary.vehicleCount}
                   </p>
                 </div>
@@ -421,17 +421,17 @@ export const ReportsPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Toplam Kayıt</p>
-                    <p className="text-2xl font-bold">{summaryReport.total.records}</p>
+                    <p className="text-lg md:text-2xl font-bold">{summaryReport.total.records}</p>
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Raporal</p>
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-lg md:text-2xl font-bold text-green-600">
                       ₺{summaryReport.total.raporal.toFixed(2)}
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Sistem</p>
-                    <p className="text-2xl font-bold text-purple-600">
+                    <p className="text-lg md:text-2xl font-bold text-purple-600">
                       ₺{summaryReport.total.sistem.toFixed(2)}
                     </p>
                   </div>
@@ -451,17 +451,17 @@ export const ReportsPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Kayıt</p>
-                    <p className="text-xl font-bold">{summaryReport.weekly.records}</p>
+                    <p className="text-base md:text-xl font-bold">{summaryReport.weekly.records}</p>
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Raporal</p>
-                    <p className="text-xl font-bold text-green-600">
+                    <p className="text-base md:text-xl font-bold text-green-600">
                       ₺{summaryReport.weekly.raporal.toFixed(2)}
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Sistem</p>
-                    <p className="text-xl font-bold text-purple-600">
+                    <p className="text-base md:text-xl font-bold text-purple-600">
                       ₺{summaryReport.weekly.sistem.toFixed(2)}
                     </p>
                   </div>
@@ -481,17 +481,17 @@ export const ReportsPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Kayıt</p>
-                    <p className="text-xl font-bold">{summaryReport.creditCard.records}</p>
+                    <p className="text-base md:text-xl font-bold">{summaryReport.creditCard.records}</p>
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Raporal</p>
-                    <p className="text-xl font-bold text-green-600">
+                    <p className="text-base md:text-xl font-bold text-green-600">
                       ₺{summaryReport.creditCard.raporal.toFixed(2)}
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Sistem</p>
-                    <p className="text-xl font-bold text-purple-600">
+                    <p className="text-base md:text-xl font-bold text-purple-600">
                       ₺{summaryReport.creditCard.sistem.toFixed(2)}
                     </p>
                   </div>
@@ -515,17 +515,17 @@ export const ReportsPage: React.FC = () => {
             <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-blue-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Toplam Kayıt</p>
-                <p className="text-2xl font-bold">{dateRangeReport.totals.recordCount}</p>
+                <p className="text-lg md:text-2xl font-bold">{dateRangeReport.totals.recordCount}</p>
               </div>
               <div className="bg-green-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Toplam Raporal</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-lg md:text-2xl font-bold text-green-600">
                   ₺{dateRangeReport.totals.totalRaporal.toFixed(2)}
                 </p>
               </div>
               <div className="bg-purple-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Toplam Sistem</p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-lg md:text-2xl font-bold text-purple-600">
                   ₺{dateRangeReport.totals.totalSystem.toFixed(2)}
                 </p>
               </div>

@@ -30,13 +30,13 @@ export const LeavePage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Yıllık İzin Yönetimi</h1>
+        <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-6">Yıllık İzin Yönetimi</h1>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 mb-6">
+        <div className="flex overflow-x-auto border-b border-gray-200 mb-6">
           <button
             onClick={() => setActiveTab('employees')}
-            className={`px-6 py-3 font-medium transition-colors ${
+            className={`px-6 py-3 font-medium transition-colors whitespace-nowrap ${
               activeTab === 'employees'
                 ? 'border-b-2 border-primary-600 text-primary-600'
                 : 'text-gray-600 hover:text-gray-900'
@@ -47,7 +47,7 @@ export const LeavePage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('requests')}
-            className={`px-6 py-3 font-medium transition-colors ${
+            className={`px-6 py-3 font-medium transition-colors whitespace-nowrap ${
               activeTab === 'requests'
                 ? 'border-b-2 border-primary-600 text-primary-600'
                 : 'text-gray-600 hover:text-gray-900'
@@ -58,7 +58,7 @@ export const LeavePage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('summary')}
-            className={`px-6 py-3 font-medium transition-colors ${
+            className={`px-6 py-3 font-medium transition-colors whitespace-nowrap ${
               activeTab === 'summary'
                 ? 'border-b-2 border-primary-600 text-primary-600'
                 : 'text-gray-600 hover:text-gray-900'
@@ -195,7 +195,7 @@ const EmployeesTab: React.FC = () => {
       )}
 
       <Card>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
           <h2 className="text-xl font-semibold">Çalışan Listesi ({employees.length})</h2>
           <Button onClick={() => handleOpenModal()}>
             <Plus className="w-4 h-4 mr-2" />
@@ -335,7 +335,7 @@ const EmployeesTab: React.FC = () => {
             </label>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end sm:space-x-3 space-y-2 sm:space-y-0 pt-4">
             <Button type="button" variant="secondary" onClick={handleCloseModal}>
               İptal
             </Button>
@@ -615,7 +615,7 @@ const LeaveRequestsTab: React.FC = () => {
               <option value="unpaid">Ücretsiz İzin</option>
             </select>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Başlangıç Tarihi"
               type="date"
@@ -640,7 +640,7 @@ const LeaveRequestsTab: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
           </div>
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end sm:space-x-3 space-y-2 sm:space-y-0 pt-4">
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
               İptal
             </Button>
@@ -670,7 +670,7 @@ const LeaveRequestsTab: React.FC = () => {
                 placeholder="Onay/Red notunuzu buraya yazabilirsiniz..."
               />
             </div>
-            <div className="flex space-x-3 pt-4">
+            <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-2 sm:space-y-0 pt-4">
               <Button onClick={() => handleReview('approve')} className="flex-1 bg-green-600 hover:bg-green-700">
                 <ThumbsUp className="w-4 h-4 mr-2" />
                 Onayla

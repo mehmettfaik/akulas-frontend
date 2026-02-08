@@ -45,7 +45,7 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-lg shadow-xl p-8">
+        <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">Giriş Yap</h2>
           
           {error && (

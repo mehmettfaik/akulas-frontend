@@ -245,9 +245,9 @@ export const BankayaGonderilenPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Bankaya Gönderilen</h1>
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900">Bankaya Gönderilen</h1>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {isReviewer && filteredRecords.length > 0 && (
               <button
                 onClick={() => generateBulkPusulaExcel(filteredRecords)}
@@ -300,12 +300,12 @@ export const BankayaGonderilenPage: React.FC = () => {
         </Card>
 
         {/* İstatistikler */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">DOLUM</p>
-                <p className="text-2xl font-bold text-blue-600">₺{totals.dolum.toFixed(2)}</p>
+                <p className="text-lg md:text-2xl font-bold text-blue-600">₺{totals.dolum.toFixed(2)}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-blue-600" />
             </div>
@@ -314,7 +314,7 @@ export const BankayaGonderilenPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">KART</p>
-                <p className="text-2xl font-bold text-purple-600">₺{totals.kart.toFixed(2)}</p>
+                <p className="text-lg md:text-2xl font-bold text-purple-600">₺{totals.kart.toFixed(2)}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-purple-600" />
             </div>
@@ -324,7 +324,7 @@ export const BankayaGonderilenPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">VİZE</p>
-                  <p className="text-2xl font-bold text-orange-600">₺{totals.vize.toFixed(2)}</p>
+                  <p className="text-lg md:text-2xl font-bold text-orange-600">₺{totals.vize.toFixed(2)}</p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-orange-600" />
               </div>
@@ -334,7 +334,7 @@ export const BankayaGonderilenPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">TOPLAM</p>
-                <p className="text-2xl font-bold text-green-600">₺{totals.total.toFixed(2)}</p>
+                <p className="text-lg md:text-2xl font-bold text-green-600">₺{totals.total.toFixed(2)}</p>
               </div>
             </div>
           </Card>
@@ -582,7 +582,7 @@ export const BankayaGonderilenPage: React.FC = () => {
                     value={reviewNotes}
                     onChange={(e) => setReviewNotes(e.target.value)}
                   />
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => handleReview(selectedRecord.id, 'approve')}
                       className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"

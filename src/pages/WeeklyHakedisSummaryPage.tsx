@@ -79,7 +79,7 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
             Haftalık Hakediş Özeti (Banka İletimi)
           </h1>
         </div>
@@ -88,7 +88,7 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
         <Card>
           <div className="p-6">
             <div className="flex flex-wrap gap-4 items-end">
-              <div className="flex-1 min-w-[200px]">
+              <div className="flex-1 min-w-[160px]">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Başlangıç Tarihi
                 </label>
@@ -103,7 +103,7 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
                 </div>
               </div>
               
-              <div className="flex-1 min-w-[200px]">
+              <div className="flex-1 min-w-[160px]">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Bitiş Tarihi
                 </label>
@@ -139,46 +139,46 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
         {/* Özet Kartları */}
         {data && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               <Card>
-                <div className="p-6">
+                <div className="p-3 md:p-6">
                   <h3 className="text-sm font-medium text-gray-500 mb-2">
                     Toplam Haftalık
                   </h3>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-xl md:text-3xl font-bold text-gray-900">
                     {data.summary.totalHaftalik.toLocaleString('tr-TR')} ₺
                   </p>
                 </div>
               </Card>
 
               <Card>
-                <div className="p-6">
+                <div className="p-3 md:p-6">
                   <h3 className="text-sm font-medium text-gray-500 mb-2">
                     Toplam Kredi Kartı
                   </h3>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-xl md:text-3xl font-bold text-gray-900">
                     {data.summary.totalKrediKarti.toLocaleString('tr-TR')} ₺
                   </p>
                 </div>
               </Card>
 
               <Card className="bg-primary-50 border-primary-200">
-                <div className="p-6">
+                <div className="p-3 md:p-6">
                   <h3 className="text-sm font-medium text-primary-700 mb-2">
                     Genel Toplam
                   </h3>
-                  <p className="text-3xl font-bold text-primary-900">
+                  <p className="text-xl md:text-3xl font-bold text-primary-900">
                     {data.summary.grandTotal.toLocaleString('tr-TR')} ₺
                   </p>
                 </div>
               </Card>
 
               <Card>
-                <div className="p-6">
+                <div className="p-3 md:p-6">
                   <h3 className="text-sm font-medium text-gray-500 mb-2">
                     Araç Sayısı
                   </h3>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-xl md:text-3xl font-bold text-gray-900">
                     {data.summary.vehicleCount}
                   </p>
                 </div>

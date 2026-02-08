@@ -289,9 +289,9 @@ export const BayiDolumPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Bayi Dolum İşlemleri</h1>
-          <div className="flex items-center text-lg font-semibold text-gray-700 bg-white px-4 py-2 rounded-lg shadow">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900">Bayi Dolum İşlemleri</h1>
+          <div className="flex items-center text-sm md:text-lg font-semibold text-gray-700 bg-white px-3 py-2 md:px-4 rounded-lg shadow">
             <Calendar className="w-5 h-5 mr-2" />
             {new Date(date).toLocaleDateString('tr-TR', { 
               day: 'numeric', 
@@ -306,7 +306,7 @@ export const BayiDolumPage: React.FC = () => {
           <Card title="Revize Edilecek Kayıtlar (Düzenlenmesi Gereken)" className="mb-6">
             <div className="space-y-3">
               {revisedRecords.map((record) => (
-                <div key={record.id} className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div key={record.id} className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <div>
                     <p className="font-semibold text-gray-900">
                       {new Date(record.date).toLocaleDateString('tr-TR')} - Toplam: ₺{record.totals.totalSales.toFixed(2)}
@@ -490,7 +490,7 @@ export const BayiDolumPage: React.FC = () => {
               {/* Toplam Satış */}
               <div className="border-t-2 border-gray-300 pt-4 mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                  <div className="md:col-span-3 text-right">
+                  <div className="md:col-span-3 text-left md:text-right">
                     <label className="block text-lg font-bold text-gray-900">
                       TOPLAM SATIŞ:
                     </label>
@@ -588,7 +588,7 @@ export const BayiDolumPage: React.FC = () => {
                 {/* Sekmeler */}
                 <div className="flex border-b border-gray-300 mb-4">
                   <button
-                    className={`px-6 py-3 font-semibold transition-colors ${
+                    className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold transition-colors ${
                       activeTab === 'dolum'
                         ? 'border-b-2 border-blue-600 text-blue-600'
                         : 'text-gray-600 hover:text-gray-900'
@@ -598,7 +598,7 @@ export const BayiDolumPage: React.FC = () => {
                     DOLUM
                   </button>
                   <button
-                    className={`px-6 py-3 font-semibold transition-colors ${
+                    className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold transition-colors ${
                       activeTab === 'kart'
                         ? 'border-b-2 border-blue-600 text-blue-600'
                         : 'text-gray-600 hover:text-gray-900'
@@ -812,7 +812,7 @@ export const BayiDolumPage: React.FC = () => {
                 </div>
 
                 {/* Bankaya Gönder Butonu */}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex flex-col sm:flex-row justify-end">
                   <Button
                     type="button"
                     onClick={() => handleSendToBank(activeTab)}
@@ -920,7 +920,7 @@ export const BayiDolumPage: React.FC = () => {
           </Card>
 
           {/* Butonlar */}
-          <div className="flex justify-end gap-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-4">
             <Button
               type="button"
               size="lg"

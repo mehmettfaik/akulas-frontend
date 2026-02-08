@@ -318,9 +318,9 @@ export const DeskPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Desk İşlemleri</h1>
-          <div className="flex items-center text-lg font-semibold text-gray-700 bg-white px-4 py-2 rounded-lg shadow">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900">Desk İşlemleri</h1>
+          <div className="flex items-center text-sm md:text-lg font-semibold text-gray-700 bg-white px-3 py-2 md:px-4 rounded-lg shadow">
             <Calendar className="w-5 h-5 mr-2" />
             {new Date(date).toLocaleDateString('tr-TR', { 
               day: 'numeric', 
@@ -337,7 +337,7 @@ export const DeskPage: React.FC = () => {
               {draftAndRevisedRecords.map((record) => (
                 <div 
                   key={record.id} 
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
@@ -617,7 +617,7 @@ export const DeskPage: React.FC = () => {
               {/* Toplam Satış */}
               <div className="border-t-2 border-gray-300 pt-4 mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                  <div className="md:col-span-3 text-right">
+                  <div className="md:col-span-3 md:text-right">
                     <label className="block text-lg font-bold text-gray-900">
                       TOPLAM SATIŞ:
                     </label>
@@ -755,9 +755,9 @@ export const DeskPage: React.FC = () => {
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Banknot/Kupür Bazlı Para Sayımı</h3>
 
                 {/* Sekmeler */}
-                <div className="flex border-b border-gray-300 mb-4">
+                <div className="flex flex-wrap border-b border-gray-300 mb-4">
                   <button
-                    className={`px-6 py-3 font-semibold transition-colors ${
+                    className={`px-3 sm:px-6 py-3 font-semibold transition-colors ${
                       activeTab === 'dolum'
                         ? 'border-b-2 border-blue-600 text-blue-600'
                         : 'text-gray-600 hover:text-gray-900'
@@ -767,7 +767,7 @@ export const DeskPage: React.FC = () => {
                     DOLUM
                   </button>
                   <button
-                    className={`px-6 py-3 font-semibold transition-colors ${
+                    className={`px-3 sm:px-6 py-3 font-semibold transition-colors ${
                       activeTab === 'kart'
                         ? 'border-b-2 border-blue-600 text-blue-600'
                         : 'text-gray-600 hover:text-gray-900'
@@ -777,7 +777,7 @@ export const DeskPage: React.FC = () => {
                     KART
                   </button>
                   <button
-                    className={`px-6 py-3 font-semibold transition-colors ${
+                    className={`px-3 sm:px-6 py-3 font-semibold transition-colors ${
                       activeTab === 'vize'
                         ? 'border-b-2 border-blue-600 text-blue-600'
                         : 'text-gray-600 hover:text-gray-900'
@@ -799,7 +799,7 @@ export const DeskPage: React.FC = () => {
                 </div>
 
                 {/* Banknot Giriş Alanları */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {/* 200 TL */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">200 TL</label>
@@ -1003,7 +1003,7 @@ export const DeskPage: React.FC = () => {
                 </div>
 
                 {/* Bankaya Gönder Butonu */}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex flex-col sm:flex-row justify-end">
                   <Button
                     type="button"
                     onClick={() => handleSendToBank(activeTab)}
@@ -1116,7 +1116,7 @@ export const DeskPage: React.FC = () => {
           </Card>
 
           {/* Butonlar */}
-          <div className="flex justify-end gap-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-4">
             {editingRecordId && (
               <Button
                 type="button"
