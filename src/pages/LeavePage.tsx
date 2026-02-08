@@ -7,7 +7,6 @@ import { Input } from '../components/ui/Input';
 import { Calendar, UserCheck, FileText, Plus, Edit, Trash2, ThumbsUp, ThumbsDown, X as XIcon } from 'lucide-react';
 import { leaveService } from '../services/leaveService';
 import type { CreateEmployeeData, CreateLeaveRequestData } from '../services/leaveService';
-import { useAuth } from '../context/AuthContext';
 import type { Employee, LeaveRequest, LeaveEntitlement } from '../types';
 import { getErrorMessage } from '../utils/errorHandler';
 
