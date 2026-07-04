@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Card } from '../components/ui/Card';
-import { Input } from '../components/ui/Input';
 import { Calendar, Search } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
 import { deskService } from '../services/deskService';

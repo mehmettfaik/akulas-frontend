@@ -3,7 +3,7 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Save, Banknote, Calculator, Send, Plus, Trash2 } from 'lucide-react';
+import { Calculator, Send, Plus, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
 import { getErrorMessage } from '../utils/errorHandler';
 import { kioskDolumService } from '../services/kioskDolumService';
