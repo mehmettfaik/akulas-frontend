@@ -14,6 +14,9 @@ import { DeskSubmittedPage } from './pages/DeskSubmittedPage';
 import { WeeklyHakedisSummaryPage } from './pages/WeeklyHakedisSummaryPage';
 import { BankayaGonderilenPage } from './pages/BankayaGonderilenPage';
 import { LeavePage } from './pages/LeavePage';
+import { KioskDolumPage } from './pages/KioskDolumPage';
+import { AdminIsletimFormlariPage } from './pages/AdminIsletimFormlariPage';
+import { PublicHakedisSorgulamaPage } from './pages/PublicHakedisSorgulamaPage';
 
 function App() {
   return (
@@ -21,12 +24,22 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/sorgulama" element={<PublicHakedisSorgulamaPage />} />
           
           <Route
             path="/"
             element={
               <ProtectedRoute allowedRoles={['admin', 'responsible', 'desk']}>
                 <HomePage />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin-isletim-formlari"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminIsletimFormlariPage />
               </ProtectedRoute>
             }
           />
@@ -126,6 +139,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <LeavePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/kiosk-dolum"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'responsible', 'desk']}>
+                <KioskDolumPage />
               </ProtectedRoute>
             }
           />

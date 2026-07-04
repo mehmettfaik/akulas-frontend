@@ -1,6 +1,6 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosError } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://akulas-backend.onrender.com/api/v1';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://akulas-backend.onrender.com/api/v1';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

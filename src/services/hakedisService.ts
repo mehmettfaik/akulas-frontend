@@ -12,6 +12,18 @@ export const hakedisService = {
     return response.data;
   },
 
+  getByDate: async (date: string, type?: string): Promise<ApiResponse<HakedisRecord | null>> => {
+    const response = await apiClient.get('/hakedis/by-date', {
+      params: { date, type }
+    });
+    return response.data;
+  },
+
+  update: async (id: string, data: Partial<HakedisFormData>): Promise<ApiResponse<HakedisRecord>> => {
+    const response = await apiClient.put(`/hakedis/${id}`, data);
+    return response.data;
+  },
+
   getById: async (id: string): Promise<ApiResponse<HakedisRecord>> => {
     const response = await apiClient.get(`/hakedis/${id}`);
     return response.data;

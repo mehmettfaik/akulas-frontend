@@ -65,7 +65,7 @@ export const bayiDolumService = {
   },
 
   // Onayla/Reddet/Revize
-  review: async (id: string, action: 'approve' | 'reject' | 'revise', notes?: string) => {
+  review: async (id: string, action: 'approve' | 'reject' | 'revise' | 'deliver_to_bank', notes?: string) => {
     const response = await apiClient.patch(`/bayi-dolum/submitted/${id}/review`, { action, notes });
     return response.data;
   },

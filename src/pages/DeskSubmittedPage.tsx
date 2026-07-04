@@ -3,7 +3,7 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Calendar, CheckCircle, XCircle, Clock, ThumbsUp, RefreshCw, ThumbsDown } from 'lucide-react';
+import { Calendar, CheckCircle, XCircle, Clock, ThumbsUp, RefreshCw, ThumbsDown, Printer } from 'lucide-react';
 import type { DeskRecord, BayiDolumRecord } from '../types';
 import axios from 'axios';
 import apiClient from '../services/api';
@@ -11,6 +11,8 @@ import { deskService } from '../services/deskService';
 import { bayiDolumService } from '../services/bayiDolumService';
 import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/errorHandler';
+import { generateDeskPdf, generateBayiDolumPdf } from '../utils/pdfGenerator';
+import { formatCurrency } from '../utils/formatCurrency';
 
 type CombinedRecord = (DeskRecord | BayiDolumRecord) & { recordType: 'desk' | 'bayi' };
 
@@ -206,6 +208,7 @@ export const DeskSubmittedPage: React.FC = () => {
                     <th className="text-right py-3 px-4 font-semibold text-gray-700">Nakit</th>
                     <th className="text-right py-3 px-4 font-semibold text-gray-700">Fark</th>
                     <th className="text-center py-3 px-4 font-semibold text-gray-700">Durum</th>
+                    <th className="text-center py-3 px-4 font-semibold text-gray-700">İşletim Formu</th>
                     <th className="text-center py-3 px-4 font-semibold text-gray-700">İşlemler</th>
                   </tr>
                 </thead>
@@ -228,13 +231,13 @@ export const DeskSubmittedPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="py-3 px-4 text-right font-medium text-blue-600">
-                        ₺{record.totals.totalSales.toFixed(2)}
+                        {formatCurrency(record.totals.totalSales)}
                       </td>
                       <td className="py-3 px-4 text-right text-orange-600">
-                        ₺{record.totals.totalCreditCard.toFixed(2)}
+                        {formatCurrency(record.totals.totalCreditCard)}
                       </td>
                       <td className="py-3 px-4 text-right text-green-600">
-                        ₺{record.totals.totalCash.toFixed(2)}
+                        {formatCurrency(record.totals.totalCash)}
                       </td>
                       <td className={`py-3 px-4 text-right font-semibold ${
                         record.totals.difference >= 0 ? 'text-green-600' : 'text-red-600'
@@ -243,6 +246,22 @@ export const DeskSubmittedPage: React.FC = () => {
                       </td>
                       <td className="py-3 px-4 text-center">
                         {getStatusBadge(record.status)}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => {
+                            if (record.recordType === 'desk') {
+                              generateDeskPdf(record as DeskRecord);
+                            } else {
+                              generateBayiDolumPdf(record as BayiDolumRecord);
+                            }
+                          }}
+                        >
+                          <Printer className="w-4 h-4 mr-1" />
+                          PDF İndir
+                        </Button>
                       </td>
                       <td className="py-3 px-4 text-center">
                         <Button
@@ -270,12 +289,25 @@ export const DeskSubmittedPage: React.FC = () => {
                   <h2 className="text-lg md:text-2xl font-bold">
                     {selectedRecord.recordType === 'desk' ? 'Desk' : 'Bayi Dolum'} Kayıt Detayı - {new Date(selectedRecord.date).toLocaleDateString('tr-TR')}
                   </h2>
-                  <button
-                    onClick={() => setSelectedRecord(null)}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    <XCircle className="w-6 h-6" />
-                  </button>
+                    <div className="flex items-center gap-2">
+                      {selectedRecord.recordType === 'desk' && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => generateDeskPdf(selectedRecord as DeskRecord)}
+                          className="mr-4"
+                        >
+                          <Printer className="w-4 h-4 mr-2" />
+                          PDF İNDİR
+                        </Button>
+                      )}
+                      <button
+                        onClick={() => setSelectedRecord(null)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <XCircle className="w-6 h-6" />
+                      </button>
+                    </div>
                 </div>
 
                 <div className="space-y-6">

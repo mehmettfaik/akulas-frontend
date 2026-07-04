@@ -1,10 +1,12 @@
+import { formatCurrency } from '../utils/formatCurrency';
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Card } from '../components/ui/Card';
 import { Modal } from '../components/ui/Modal';
-import { Calendar, TrendingUp, ThumbsUp, ThumbsDown, RefreshCw, FileSpreadsheet, Eye } from 'lucide-react';
+import { Calendar, TrendingUp, ThumbsUp, ThumbsDown, RefreshCw, FileSpreadsheet, Eye, Banknote, CheckCircle } from 'lucide-react';
 import { deskService } from '../services/deskService';
 import { bayiDolumService } from '../services/bayiDolumService';
+import { kioskDolumService } from '../services/kioskDolumService';
 import { useAuth } from '../context/AuthContext';
 import { generatePusulaExcel, generateBulkPusulaExcel } from '../utils/excelExport';
 import type { DeskRecord, BayiDolumRecord } from '../types';
@@ -18,7 +20,7 @@ interface BanknoteDenominations {
 interface BankSentRecord {
   id: string;
   date: string;
-  type: 'desk' | 'bayi';
+  type: 'desk' | 'bayi' | 'kiosk';
   status: string;
   bankSentCash: {
     dolum?: number;
@@ -46,6 +48,7 @@ const statusLabels: Record<string, { label: string; className: string }> = {
   rejected: { label: 'Reddedildi', className: 'bg-red-100 text-red-800' },
   pending_revision: { label: 'Revize Bekliyor', className: 'bg-orange-100 text-orange-800' },
   revised: { label: 'Revize Edildi', className: 'bg-blue-100 text-blue-800' },
+  teslim_edildi: { label: 'Bankaya Teslim Edildi', className: 'bg-indigo-100 text-indigo-800' },
 };
 
 const DENOMINATION_VALUES: Record<string, number> = {
@@ -63,12 +66,13 @@ export const BankayaGonderilenPage: React.FC = () => {
   const { user } = useAuth();
   const [records, setRecords] = useState<BankSentRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterType, setFilterType] = useState<'all' | 'desk' | 'bayi'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'desk' | 'bayi' | 'kiosk'>('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<BankSentRecord | null>(null);
   const [reviewNotes, setReviewNotes] = useState('');
   const [reviewLoading, setReviewLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const isReviewer = user && ['admin', 'responsible'].includes(user.role);
 
@@ -79,9 +83,10 @@ export const BankayaGonderilenPage: React.FC = () => {
   const fetchRecords = async () => {
     setLoading(true);
     try {
-      const [deskResponse, bayiResponse] = await Promise.all([
+      const [deskResponse, bayiResponse, kioskResponse] = await Promise.all([
         deskService.getSubmitted(),
-        bayiDolumService.getSubmitted()
+        bayiDolumService.getSubmitted(),
+        kioskDolumService.getSubmitted()
       ]);
 
       const deskRecords: BankSentRecord[] = (deskResponse.data || [])
@@ -122,7 +127,26 @@ export const BankayaGonderilenPage: React.FC = () => {
           reviewedAt: record.reviewedAt,
         }));
 
-      const allRecords = [...deskRecords, ...bayiRecords].sort((a, b) =>
+      const kioskRecords: BankSentRecord[] = (kioskResponse.data || [])
+        .filter((record: Record<string, unknown>) => {
+          const bankSentCash = record.bankSentCash as { dolum?: number };
+          return bankSentCash && (bankSentCash.dolum || 0) > 0;
+        })
+        .map((record: Record<string, unknown>) => ({
+          id: record.id as string,
+          date: record.date as string,
+          type: 'kiosk' as const,
+          status: record.status as string,
+          bankSentCash: (record.bankSentCash as unknown) || {},
+          banknotes: record.banknotes as unknown,
+          submittedByEmail: (record.submittedByEmail || record.submittedBy) as string,
+          submittedAt: (record.submittedAt || record.createdAt) as string,
+          reviewedByEmail: record.reviewedByEmail as string,
+          reviewNotes: record.reviewerNotes as string,
+          reviewedAt: record.reviewedAt as string,
+        }));
+
+      const allRecords = [...deskRecords, ...bayiRecords, ...kioskRecords].sort((a, b) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
 
@@ -134,40 +158,85 @@ export const BankayaGonderilenPage: React.FC = () => {
     }
   };
 
-  const handleReview = async (recordId: string, action: 'approve' | 'reject' | 'revise') => {
+  const handleReview = async (recordId: string, action: 'approve' | 'reject' | 'revise' | 'deliver_to_bank') => {
     if (!selectedRecord) return;
 
-    const actionLabels = { approve: 'onaylamak', reject: 'reddetmek', revise: 'revize etmek' };
+    const actionLabels = { approve: 'onaylamak', reject: 'reddetmek', revise: 'revize etmek', deliver_to_bank: 'bankaya teslim etmek' };
     if (!window.confirm(`Bu kaydı ${actionLabels[action]} istediğinize emin misiniz?`)) return;
 
     setReviewLoading(true);
     try {
       if (selectedRecord.type === 'desk') {
         await deskService.review(recordId, action, reviewNotes || undefined);
-      } else {
+      } else if (selectedRecord.type === 'bayi') {
         await bayiDolumService.review(recordId, action, reviewNotes || undefined);
+      } else if (selectedRecord.type === 'kiosk') {
+        await kioskDolumService.review(recordId, action, reviewNotes || undefined);
       }
 
-      const statusMap: Record<string, string> = {
-        approve: 'approved', reject: 'rejected', revise: 'pending_revision'
-      };
-
-      setRecords(prev => prev.map(r =>
-        r.id === recordId ? { ...r, status: statusMap[action] } : r
-      ));
-
-      const msgMap = { approve: 'onaylandı', reject: 'reddedildi', revise: 'revize için geri gönderildi' };
+      const msgMap: Record<string, string> = { approve: 'onaylandı', reject: 'reddedildi', revise: 'revize için geri gönderildi', deliver_to_bank: 'bankaya teslim edildi' };
       alert(`Kayıt başarıyla ${msgMap[action]}!`);
       setReviewNotes('');
-      setSelectedRecord(null);
+      fetchRecords();
     } catch (error) {
-      alert(getErrorMessage(error, 'İşlem sırasında bir hata oluştu!'));
+      alert(getErrorMessage(error, `Kayıt ${actionLabels[action]} sırasında hata oluştu.`));
+    } finally {
+      setReviewLoading(false);
+      setSelectedRecord(null);
+    }
+  };
+
+  const handleBulkDeliverToBank = async () => {
+    if (selectedIds.length === 0) return;
+    
+    if (!window.confirm(`Seçilen ${selectedIds.length} kaydı bankaya teslim etmek istediğinize emin misiniz?`)) return;
+
+    setReviewLoading(true);
+    try {
+      // API call to update status for each selected record
+      // We process them one by one since there is no bulk endpoint yet
+      await Promise.all(selectedIds.map(async (id) => {
+        const record = records.find(r => r.id === id);
+        if (record) {
+          if (record.type === 'desk') {
+            await deskService.review(id, 'deliver_to_bank');
+          } else if (record.type === 'bayi') {
+            await bayiDolumService.review(id, 'deliver_to_bank');
+          } else if (record.type === 'kiosk') {
+            await kioskDolumService.review(id, 'deliver_to_bank');
+          }
+        }
+      }));
+      
+      alert('Seçilen kayıtlar başarıyla bankaya teslim edildi.');
+      setSelectedIds([]);
+      fetchRecords();
+    } catch (error) {
+      alert(getErrorMessage(error, 'Kayıtlar bankaya teslim edilirken hata oluştu.'));
     } finally {
       setReviewLoading(false);
     }
   };
 
-  // Filtreleme
+  // Sadece Onaylanan ve henüz teslim edilmeyenleri seçilebilir yap
+  const deliverableRecords = records.filter(r => r.status === 'approved');
+  
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(deliverableRecords.map(r => r.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRecord = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds(prev => [...prev, id]);
+    } else {
+      setSelectedIds(prev => prev.filter(item => item !== id));
+    }
+  };
+
   const filteredRecords = records.filter(record => {
     if (filterType !== 'all' && record.type !== filterType) return false;
     if (startDate && new Date(record.date) < new Date(startDate)) return false;
@@ -216,8 +285,8 @@ export const BankayaGonderilenPage: React.FC = () => {
                   <tr key={denom} className="border-t border-gray-100">
                     <td className="px-3 py-1.5">{DENOMINATION_LABELS[denom]}</td>
                     <td className="px-3 py-1.5 text-right">{count}</td>
-                    <td className="px-3 py-1.5 text-right">₺{value.toFixed(2)}</td>
-                    <td className="px-3 py-1.5 text-right font-medium">₺{(count * value).toFixed(2)}</td>
+                    <td className="px-3 py-1.5 text-right">{formatCurrency(value)}</td>
+                    <td className="px-3 py-1.5 text-right font-medium">{formatCurrency(count * value)}</td>
                   </tr>
                 );
               })}
@@ -226,12 +295,12 @@ export const BankayaGonderilenPage: React.FC = () => {
               <tr className="border-t-2 border-gray-300 bg-gray-50 font-bold">
                 <td colSpan={3} className="px-3 py-1.5">Kupür Toplamı</td>
                 <td className="px-3 py-1.5 text-right">
-                  ₺{DENOM_KEYS.reduce((sum, k) => sum + (banknoteData[k] || 0) * DENOMINATION_VALUES[k], 0).toFixed(2)}
+                  {formatCurrency(DENOM_KEYS.reduce((sum, k) => sum + (banknoteData[k] || 0) * DENOMINATION_VALUES[k], 0))}
                 </td>
               </tr>
               <tr className="bg-gray-50 font-bold">
                 <td colSpan={3} className="px-3 py-1.5">Bankaya Gönderilen</td>
-                <td className={`px-3 py-1.5 text-right ${colorClass}`}>₺{bankSentAmount.toFixed(2)}</td>
+                <td className={`px-3 py-1.5 text-right ${colorClass}`}>{formatCurrency(bankSentAmount)}</td>
               </tr>
             </tfoot>
           </table>
@@ -258,7 +327,7 @@ export const BankayaGonderilenPage: React.FC = () => {
               </button>
             )}
             <div className="flex items-center text-lg font-semibold text-gray-700 bg-white px-4 py-2 rounded-lg shadow">
-              Toplam: ₺{totals.total.toFixed(2)}
+              Toplam: {formatCurrency(totals.total)}
             </div>
           </div>
         </div>
@@ -271,11 +340,12 @@ export const BankayaGonderilenPage: React.FC = () => {
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 value={filterType}
-                onChange={(e) => setFilterType(e.target.value as 'all' | 'desk' | 'bayi')}
+                onChange={(e) => setFilterType(e.target.value as 'all' | 'desk' | 'bayi' | 'kiosk')}
               >
                 <option value="all">Tümü</option>
                 <option value="desk">Desk İşlemleri</option>
                 <option value="bayi">Bayi Dolum</option>
+                <option value="kiosk">Kiosk Dolum</option>
               </select>
             </div>
             <div>
@@ -305,7 +375,7 @@ export const BankayaGonderilenPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">DOLUM</p>
-                <p className="text-lg md:text-2xl font-bold text-blue-600">₺{totals.dolum.toFixed(2)}</p>
+                <p className="text-lg md:text-2xl font-bold text-blue-600">{formatCurrency(totals.dolum)}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-blue-600" />
             </div>
@@ -314,7 +384,7 @@ export const BankayaGonderilenPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">KART</p>
-                <p className="text-lg md:text-2xl font-bold text-purple-600">₺{totals.kart.toFixed(2)}</p>
+                <p className="text-lg md:text-2xl font-bold text-purple-600">{formatCurrency(totals.kart)}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-purple-600" />
             </div>
@@ -324,7 +394,7 @@ export const BankayaGonderilenPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">VİZE</p>
-                  <p className="text-lg md:text-2xl font-bold text-orange-600">₺{totals.vize.toFixed(2)}</p>
+                  <p className="text-lg md:text-2xl font-bold text-orange-600">{formatCurrency(totals.vize)}</p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-orange-600" />
               </div>
@@ -334,7 +404,7 @@ export const BankayaGonderilenPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">TOPLAM</p>
-                <p className="text-lg md:text-2xl font-bold text-green-600">₺{totals.total.toFixed(2)}</p>
+                <p className="text-lg md:text-2xl font-bold text-green-600">{formatCurrency(totals.total)}</p>
               </div>
             </div>
           </Card>
@@ -363,6 +433,15 @@ export const BankayaGonderilenPage: React.FC = () => {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-100 border-b border-gray-200">
+                    <th className="px-4 py-3 text-left">
+                      <input 
+                        type="checkbox" 
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        checked={deliverableRecords.length > 0 && selectedIds.length === deliverableRecords.length}
+                        disabled={deliverableRecords.length === 0}
+                      />
+                    </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tarih</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tip</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Durum</th>
@@ -384,7 +463,16 @@ export const BankayaGonderilenPage: React.FC = () => {
                     const statusInfo = statusLabels[record.status] || { label: record.status, className: 'bg-gray-100 text-gray-800' };
 
                     return (
-                      <tr key={record.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                      <tr key={record.id} className={`border-b border-gray-200 transition-colors ${selectedIds.includes(record.id) ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
+                        <td className="px-4 py-3">
+                          <input 
+                            type="checkbox"
+                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 disabled:opacity-50"
+                            checked={selectedIds.includes(record.id)}
+                            onChange={(e) => handleSelectRecord(record.id, e.target.checked)}
+                            disabled={record.status !== 'approved'}
+                          />
+                        </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center">
                             <Calendar className="w-4 h-4 mr-2 text-gray-500" />
@@ -397,9 +485,11 @@ export const BankayaGonderilenPage: React.FC = () => {
                           <span className={`px-2 py-1 rounded text-xs font-medium ${
                             record.type === 'desk'
                               ? 'bg-blue-100 text-blue-800'
-                              : 'bg-purple-100 text-purple-800'
+                              : record.type === 'bayi'
+                                ? 'bg-purple-100 text-purple-800'
+                                : 'bg-green-100 text-green-800'
                           }`}>
-                            {record.type === 'desk' ? 'Desk İşlemleri' : 'Bayi Dolum'}
+                            {record.type === 'desk' ? 'Desk İşlemleri' : record.type === 'bayi' ? 'Bayi Dolum' : 'Kiosk Dolum'}
                           </span>
                         </td>
                         <td className="px-4 py-3">
@@ -408,16 +498,16 @@ export const BankayaGonderilenPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-medium text-gray-900">
-                          {record.bankSentCash.dolum ? `₺${record.bankSentCash.dolum.toFixed(2)}` : '-'}
+                          {record.bankSentCash.dolum ? formatCurrency(record.bankSentCash.dolum) : '-'}
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-medium text-gray-900">
-                          {record.bankSentCash.kart ? `₺${record.bankSentCash.kart.toFixed(2)}` : '-'}
+                          {record.bankSentCash.kart ? formatCurrency(record.bankSentCash.kart) : '-'}
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-medium text-gray-900">
-                          {record.bankSentCash.vize ? `₺${record.bankSentCash.vize.toFixed(2)}` : '-'}
+                          {record.bankSentCash.vize ? formatCurrency(record.bankSentCash.vize) : '-'}
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-bold text-green-600">
-                          ₺{recordTotal.toFixed(2)}
+                          {formatCurrency(recordTotal)}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">
                           {record.submittedByEmail}
@@ -437,23 +527,41 @@ export const BankayaGonderilenPage: React.FC = () => {
                 </tbody>
                 <tfoot>
                   <tr className="bg-gray-100 font-bold">
-                    <td colSpan={3} className="px-4 py-3 text-left text-sm">TOPLAM</td>
+                    <td colSpan={4} className="px-4 py-3 text-left text-sm">TOPLAM</td>
                     <td className="px-4 py-3 text-right text-sm text-blue-600">
-                      ₺{totals.dolum.toFixed(2)}
+                      {formatCurrency(totals.dolum)}
                     </td>
                     <td className="px-4 py-3 text-right text-sm text-purple-600">
-                      ₺{totals.kart.toFixed(2)}
+                      {formatCurrency(totals.kart)}
                     </td>
                     <td className="px-4 py-3 text-right text-sm text-orange-600">
-                      ₺{totals.vize.toFixed(2)}
+                      {formatCurrency(totals.vize)}
                     </td>
                     <td className="px-4 py-3 text-right text-sm text-green-600">
-                      ₺{totals.total.toFixed(2)}
+                      {formatCurrency(totals.total)}
                     </td>
                     <td colSpan={2} className="px-4 py-3"></td>
                   </tr>
                 </tfoot>
               </table>
+            </div>
+          )}
+          
+          {/* Bankaya Teslim Et Butonu */}
+          {selectedIds.length > 0 && (
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={handleBulkDeliverToBank}
+                disabled={reviewLoading}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition-colors flex items-center"
+              >
+                {reviewLoading ? (
+                  <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                ) : (
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                )}
+                Seçilenleri Bankaya Teslim Et ({selectedIds.length})
+              </button>
             </div>
           )}
         </Card>
@@ -462,7 +570,7 @@ export const BankayaGonderilenPage: React.FC = () => {
         <Modal
           isOpen={!!selectedRecord}
           onClose={() => { setSelectedRecord(null); setReviewNotes(''); }}
-          title={`${selectedRecord?.type === 'desk' ? 'Desk İşlemleri' : 'Bayi Dolum'} - Bankaya Gönderilen Detay`}
+          title={`${selectedRecord?.type === 'desk' ? 'Desk İşlemleri' : selectedRecord?.type === 'bayi' ? 'Bayi Dolum' : 'Kiosk Dolum'} - Bankaya Gönderilen Detay`}
           size="xl"
         >
           {selectedRecord && (
@@ -486,7 +594,7 @@ export const BankayaGonderilenPage: React.FC = () => {
                 <div className="bg-green-50 p-3 rounded-lg">
                   <p className="text-xs text-gray-500 mb-1">Toplam Gönderilen</p>
                   <p className="text-lg font-bold text-green-600">
-                    ₺{((selectedRecord.bankSentCash.dolum || 0) + (selectedRecord.bankSentCash.kart || 0) + (selectedRecord.bankSentCash.vize || 0)).toFixed(2)}
+                    {formatCurrency((selectedRecord.bankSentCash.dolum || 0) + (selectedRecord.bankSentCash.kart || 0) + (selectedRecord.bankSentCash.vize || 0))}
                   </p>
                 </div>
               </div>
@@ -496,19 +604,19 @@ export const BankayaGonderilenPage: React.FC = () => {
                 {(selectedRecord.bankSentCash.dolum || 0) > 0 && (
                   <div className="bg-blue-50 p-3 rounded-lg text-center">
                     <p className="text-xs text-blue-600 font-medium">DOLUM</p>
-                    <p className="text-xl font-bold text-blue-700">₺{selectedRecord.bankSentCash.dolum?.toFixed(2)}</p>
+                    <p className="text-xl font-bold text-blue-700">{formatCurrency(selectedRecord.bankSentCash.dolum)}</p>
                   </div>
                 )}
                 {(selectedRecord.bankSentCash.kart || 0) > 0 && (
                   <div className="bg-purple-50 p-3 rounded-lg text-center">
                     <p className="text-xs text-purple-600 font-medium">KART</p>
-                    <p className="text-xl font-bold text-purple-700">₺{selectedRecord.bankSentCash.kart?.toFixed(2)}</p>
+                    <p className="text-xl font-bold text-purple-700">{formatCurrency(selectedRecord.bankSentCash.kart)}</p>
                   </div>
                 )}
                 {(selectedRecord.bankSentCash.vize || 0) > 0 && (
                   <div className="bg-orange-50 p-3 rounded-lg text-center">
                     <p className="text-xs text-orange-600 font-medium">VİZE</p>
-                    <p className="text-xl font-bold text-orange-700">₺{selectedRecord.bankSentCash.vize?.toFixed(2)}</p>
+                    <p className="text-xl font-bold text-orange-700">{formatCurrency(selectedRecord.bankSentCash.vize)}</p>
                   </div>
                 )}
               </div>
@@ -608,6 +716,21 @@ export const BankayaGonderilenPage: React.FC = () => {
                       Reddet
                     </button>
                   </div>
+                </div>
+              )}
+
+              {/* Bankaya Teslim Et Bölümü */}
+              {isReviewer && selectedRecord.status === 'approved' && (
+                <div className="border-t-2 border-gray-300 pt-4 mt-4">
+                  <h3 className="text-lg font-semibold mb-3">Teslimat İşlemi</h3>
+                  <button
+                    onClick={() => handleReview(selectedRecord.id, 'deliver_to_bank')}
+                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                    disabled={reviewLoading}
+                  >
+                    <Banknote className="w-5 h-5" />
+                    Bankaya Teslim Et
+                  </button>
                 </div>
               )}
             </div>

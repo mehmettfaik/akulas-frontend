@@ -3,7 +3,8 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Calendar, Send, Edit, RefreshCw } from 'lucide-react';
+import { Calendar, Edit, RefreshCw, Send } from 'lucide-react';
+import { formatCurrency } from '../utils/formatCurrency';
 import { getErrorMessage } from '../utils/errorHandler';
 import { bayiDolumService } from '../services/bayiDolumService';
 import type { BayiDolumRecord } from '../types';
@@ -165,15 +166,7 @@ export const BayiDolumPage: React.FC = () => {
     );
   };
 
-  // Bankaya gönder fonksiyonu
-  const handleSendToBank = (category: 'dolum' | 'kart') => {
-    const categoryTotal = calculateBanknoteTotal(category);
-    setBankSentCash({
-      ...bankSentCash,
-      [category]: categoryTotal
-    });
-    setMessage({ type: 'success', text: `${category.toUpperCase()} kategorisi için ₺${categoryTotal.toFixed(2)} bankaya gönderildi olarak işaretlendi. Kaydetmek için "Sorumluya Teslim Et" butonunu kullanın.` });
-  };
+
 
   // Kategori toplamları hesaplama
   const calculateDolumTotal = () => products.bayiDolum * UNIT_PRICES.bayiDolum;
@@ -223,6 +216,14 @@ export const BayiDolumPage: React.FC = () => {
     setMessage(null);
 
     try {
+      // Otomatik olarak küpür toplamlarını bankSentCash'e yaz
+      const autoBankSentCash = {
+        dolum: calculateBanknoteTotal('dolum'),
+        kart: calculateBanknoteTotal('kart'),
+        totalSent: calculateBanknoteTotal('dolum') + calculateBanknoteTotal('kart')
+      };
+      setBankSentCash(autoBankSentCash);
+
       const submitData = {
         date,
         products,
@@ -233,7 +234,7 @@ export const BayiDolumPage: React.FC = () => {
           ertesiGuneBirakilan: payments.ertesiGuneBirakilan
         },
         banknotes,
-        bankSentCash
+        bankSentCash: autoBankSentCash
       };
 
       if (editingRecordId) {
@@ -309,7 +310,7 @@ export const BayiDolumPage: React.FC = () => {
                 <div key={record.id} className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <div>
                     <p className="font-semibold text-gray-900">
-                      {new Date(record.date).toLocaleDateString('tr-TR')} - Toplam: ₺{record.totals.totalSales.toFixed(2)}
+                      {new Date(record.date).toLocaleDateString('tr-TR')} - Toplam: {formatCurrency(record.totals.totalSales)}
                     </p>
                     {record.reviewNotes && (
                       <p className="text-sm text-gray-600 mt-1">
@@ -376,7 +377,7 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.bayiDolum.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.bayiDolum)}
                     disabled
                   />
                 </div>
@@ -384,7 +385,7 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.bayiDolum * UNIT_PRICES.bayiDolum).toFixed(2)}`}
+                    value={formatCurrency(products.bayiDolum * UNIT_PRICES.bayiDolum)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -408,7 +409,7 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.bayiTamKart.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.bayiTamKart)}
                     disabled
                   />
                 </div>
@@ -416,7 +417,7 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.bayiTamKart * UNIT_PRICES.bayiTamKart).toFixed(2)}`}
+                    value={formatCurrency(products.bayiTamKart * UNIT_PRICES.bayiTamKart)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -440,7 +441,7 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.bayiKartKilifi.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.bayiKartKilifi)}
                     disabled
                   />
                 </div>
@@ -448,7 +449,7 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.bayiKartKilifi * UNIT_PRICES.bayiKartKilifi).toFixed(2)}`}
+                    value={formatCurrency(products.bayiKartKilifi * UNIT_PRICES.bayiKartKilifi)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -472,7 +473,7 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.posRulosu.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.posRulosu)}
                     disabled
                   />
                 </div>
@@ -480,7 +481,7 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.posRulosu * UNIT_PRICES.posRulosu).toFixed(2)}`}
+                    value={formatCurrency(products.posRulosu * UNIT_PRICES.posRulosu)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -498,7 +499,7 @@ export const BayiDolumPage: React.FC = () => {
                   <div>
                     <Input
                       type="text"
-                      value={`₺${totalSales.toFixed(2)}`}
+                      value={formatCurrency(totalSales)}
                       disabled
                       className="font-bold text-xl text-blue-600"
                     />
@@ -524,7 +525,7 @@ export const BayiDolumPage: React.FC = () => {
                       <tr>
                         <td className="border border-gray-300 px-4 py-2 font-medium">DOLUM</td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
-                          ₺{calculateDolumTotal().toFixed(2)}
+                          {formatCurrency(calculateDolumTotal())}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
                           <input
@@ -538,14 +539,14 @@ export const BayiDolumPage: React.FC = () => {
                           />
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right font-semibold text-green-600">
-                          ₺{calculateDolumCash().toFixed(2)}
+                          {formatCurrency(calculateDolumCash())}
                         </td>
                       </tr>
-                      {/* KART */}
+                      {/* KART / KART KILIFI */}
                       <tr>
-                        <td className="border border-gray-300 px-4 py-2 font-medium">KART</td>
+                        <td className="border border-gray-300 px-4 py-2 font-medium">KART / KART KILIFI</td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
-                          ₺{calculateKartTotal().toFixed(2)}
+                          {formatCurrency(calculateKartTotal())}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
                           <input
@@ -559,7 +560,7 @@ export const BayiDolumPage: React.FC = () => {
                           />
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right font-semibold text-green-600">
-                          ₺{calculateKartCash().toFixed(2)}
+                          {formatCurrency(calculateKartCash())}
                         </td>
                       </tr>
                     </tbody>
@@ -567,13 +568,13 @@ export const BayiDolumPage: React.FC = () => {
                       <tr className="bg-gray-200 font-bold">
                         <td className="border border-gray-300 px-4 py-2"></td>
                         <td className="border border-gray-300 px-4 py-2 text-right text-blue-600">
-                          ₺{totalSales.toFixed(2)}
+                          {formatCurrency(totalSales)}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right text-orange-700">
-                          ₺{calculateTotalCategoryCreditCard().toFixed(2)}
+                          {formatCurrency(calculateTotalCategoryCreditCard())}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right text-green-600">
-                          ₺{calculateTotalCategoryCash().toFixed(2)}
+                          {formatCurrency(calculateTotalCategoryCash())}
                         </td>
                       </tr>
                     </tfoot>
@@ -605,15 +606,15 @@ export const BayiDolumPage: React.FC = () => {
                     }`}
                     onClick={() => setActiveTab('kart')}
                   >
-                    KART
+                    KART / KART KILIFI
                   </button>
                 </div>
 
                 {/* Nakit Toplam Gösterimi */}
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                   <p className="text-sm text-blue-800">
-                    <strong>Nakit Toplam ({activeTab.toUpperCase()}):</strong> ₺
-                    {activeTab === 'dolum' ? calculateDolumCash().toFixed(2) : calculateKartCash().toFixed(2)}
+                    <strong>Nakit Toplam ({activeTab === 'kart' ? 'KART / KART KILIFI' : activeTab.toUpperCase()}):</strong>{' '}
+                    {activeTab === 'dolum' ? formatCurrency(calculateDolumCash()) : formatCurrency(calculateKartCash())}
                   </p>
                 </div>
 
@@ -633,7 +634,7 @@ export const BayiDolumPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b200 * 200).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b200 * 200)}
                       </span>
                     </div>
                   </div>
@@ -651,7 +652,7 @@ export const BayiDolumPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b100 * 100).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b100 * 100)}
                       </span>
                     </div>
                   </div>
@@ -669,7 +670,7 @@ export const BayiDolumPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b50 * 50).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b50 * 50)}
                       </span>
                     </div>
                   </div>
@@ -687,7 +688,7 @@ export const BayiDolumPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b20 * 20).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b20 * 20)}
                       </span>
                     </div>
                   </div>
@@ -705,7 +706,7 @@ export const BayiDolumPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b10 * 10).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b10 * 10)}
                       </span>
                     </div>
                   </div>
@@ -723,7 +724,7 @@ export const BayiDolumPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b5 * 5).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b5 * 5)}
                       </span>
                     </div>
                   </div>
@@ -741,7 +742,7 @@ export const BayiDolumPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].c1 * 1).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].c1 * 1)}
                       </span>
                     </div>
                   </div>
@@ -759,7 +760,7 @@ export const BayiDolumPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].c050 * 0.50).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].c050 * 0.50)}
                       </span>
                     </div>
                   </div>
@@ -771,12 +772,12 @@ export const BayiDolumPage: React.FC = () => {
                     <div>
                       <p className="text-sm text-gray-600">Nakit Toplam (Ödeme Dağılımı)</p>
                       <p className="text-lg font-bold text-blue-600">
-                        ₺{activeTab === 'dolum' ? calculateDolumCash().toFixed(2) : calculateKartCash().toFixed(2)}
+                        {activeTab === 'dolum' ? formatCurrency(calculateDolumCash()) : formatCurrency(calculateKartCash())}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Banknot Sayımı Toplam</p>
-                      <p className="text-lg font-bold text-green-600">₺{calculateBanknoteTotal(activeTab).toFixed(2)}</p>
+                      <p className="text-lg font-bold text-green-600">{formatCurrency(calculateBanknoteTotal(activeTab))}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Fark</p>
@@ -785,9 +786,9 @@ export const BayiDolumPage: React.FC = () => {
                           (activeTab === 'dolum' ? calculateDolumCash() : calculateKartCash()) - calculateBanknoteTotal(activeTab)
                         ) < 0.01 ? 'text-green-600' : 'text-red-600'
                       }`}>
-                        ₺{(
+                        {formatCurrency(
                           (activeTab === 'dolum' ? calculateDolumCash() : calculateKartCash()) - calculateBanknoteTotal(activeTab)
-                        ).toFixed(2)}
+                        )}
                       </p>
                     </div>
                   </div>
@@ -811,17 +812,7 @@ export const BayiDolumPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Bankaya Gönder Butonu */}
-                <div className="mt-4 flex flex-col sm:flex-row justify-end">
-                  <Button
-                    type="button"
-                    onClick={() => handleSendToBank(activeTab)}
-                    disabled={calculateBanknoteTotal(activeTab) === 0}
-                  >
-                    <Send className="w-5 h-5 mr-2" />
-                    BANKAYA GÖNDER ({activeTab.toUpperCase()})
-                  </Button>
-                </div>
+
 
                 {/* Bankaya Gönderilen Toplam */}
                 {(bankSentCash.dolum > 0 || bankSentCash.kart > 0) && (
@@ -831,19 +822,19 @@ export const BayiDolumPage: React.FC = () => {
                       {bankSentCash.dolum > 0 && (
                         <div>
                           <p className="text-sm text-gray-600">DOLUM</p>
-                          <p className="text-lg font-bold text-green-600">₺{bankSentCash.dolum.toFixed(2)}</p>
+                          <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.dolum)}</p>
                         </div>
                       )}
                       {bankSentCash.kart > 0 && (
                         <div>
-                          <p className="text-sm text-gray-600">KART</p>
-                          <p className="text-lg font-bold text-green-600">₺{bankSentCash.kart.toFixed(2)}</p>
+                          <p className="text-sm text-gray-600">KART / KART KILIFI</p>
+                          <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.kart)}</p>
                         </div>
                       )}
                       <div>
                         <p className="text-sm text-gray-600">TOPLAM</p>
                         <p className="text-lg font-bold text-green-600">
-                          ₺{(bankSentCash.dolum + bankSentCash.kart).toFixed(2)}
+                          {formatCurrency(bankSentCash.dolum + bankSentCash.kart)}
                         </p>
                       </div>
                     </div>
@@ -869,7 +860,7 @@ export const BayiDolumPage: React.FC = () => {
                 <Input
                   label="KREDİ KARTI (Otomatik)"
                   type="text"
-                  value={`₺${calculateTotalCategoryCreditCard().toFixed(2)}`}
+                  value={formatCurrency(calculateTotalCategoryCreditCard())}
                   disabled
                   className="font-semibold text-orange-600"
                 />
@@ -901,14 +892,14 @@ export const BayiDolumPage: React.FC = () => {
                   <Input
                     label="KASADA KALAN"
                     type="text"
-                    value={`₺${cashInRegister.toFixed(2)}`}
+                    value={formatCurrency(cashInRegister)}
                     disabled
                     className="font-bold text-lg text-purple-600"
                   />
                   <Input
                     label="FARK"
                     type="text"
-                    value={`₺${difference.toFixed(2)}`}
+                    value={formatCurrency(difference)}
                     disabled
                     className={`font-bold text-lg ${
                       difference > 0 ? 'text-green-600' : difference < 0 ? 'text-red-600' : 'text-gray-600'

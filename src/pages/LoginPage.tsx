@@ -1,5 +1,6 @@
 import React, { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -83,6 +84,17 @@ export const LoginPage: React.FC = () => {
               {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
             </Button>
           </form>
+
+          <div className="mt-6 text-center border-t pt-6">
+            <p className="text-sm text-gray-600 mb-2">Hakediş bilgilerinizi öğrenmek için:</p>
+            <Link
+              to="/sorgulama"
+              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Hakediş Sorgulama Sayfasına Git
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
+          </div>
         </div>
 
         {/* Footer */}

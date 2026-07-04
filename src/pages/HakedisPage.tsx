@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -7,6 +7,7 @@ import { hakedisService } from '../services/hakedisService';
 import type { HakedisFormData } from '../types';
 import { Calendar } from 'lucide-react';
 import { getErrorMessage } from '../utils/errorHandler';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const ROUTES = ['Makas', 'Makas3', 'Sanayi', 'Hastane', 'Kurtuluş', 'Paşacık', 'Belediye'];
 const VEHICLE_NUMBERS = [1, 5, 6, 8, 9, 28, 38, 41, 48, 53, 55, 66, 68, 71, 76, 83, 95, 103, 112, 114, 144, 145, 166, 182, 185];
@@ -19,7 +20,40 @@ export const HakedisPage: React.FC = () => {
   const [raporal, setRaporal] = useState<number>(0);
   const [sistem, setSistem] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [existingRecordId, setExistingRecordId] = useState<string | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
+
+  useEffect(() => {
+    const fetchExistingRecord = async () => {
+      setIsFetching(true);
+      setMessage(null);
+      setExistingRecordId(null);
+      setRouteValues({});
+      setVehicleValues({});
+      setRaporal(0);
+      setSistem(0);
+
+      try {
+        const response = await hakedisService.getByDate(date, type);
+        if (response.data) {
+          const record = response.data;
+          setExistingRecordId(record.id);
+          if (record.routes) setRouteValues(record.routes);
+          if (record.vehicles) setVehicleValues(record.vehicles);
+          setRaporal(record.raporal || 0);
+          setSistem(record.sistem || 0);
+          setMessage({ type: 'info', text: 'Bu tarih ve tip için mevcut kayıt yüklendi. Güncelleme yapabilirsiniz.' });
+        }
+      } catch (error) {
+        console.error("Mevcut kayıt kontrolü hatası:", error);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchExistingRecord();
+  }, [date, type]);
 
   const difference = raporal - sistem;
 
@@ -82,14 +116,19 @@ export const HakedisPage: React.FC = () => {
         formData.vehicles = filteredVehicles;
       }
 
-      await hakedisService.create(formData);
-      setMessage({ type: 'success', text: 'Hakediş başarıyla oluşturuldu!' });
-
-      // Reset form
-      setRouteValues({});
-      setVehicleValues({});
-      setRaporal(0);
-      setSistem(0);
+      if (existingRecordId) {
+        await hakedisService.update(existingRecordId, formData);
+        setMessage({ type: 'success', text: 'Hakediş başarıyla güncellendi!' });
+      } else {
+        await hakedisService.create(formData);
+        setMessage({ type: 'success', text: 'Hakediş başarıyla oluşturuldu!' });
+        
+        // Reset form ONLY on create (on update, keep data on screen)
+        setRouteValues({});
+        setVehicleValues({});
+        setRaporal(0);
+        setSistem(0);
+      }
     } catch (error) {
       setMessage({ type: 'error', text: getErrorMessage(error) });
     } finally {
@@ -103,19 +142,16 @@ export const HakedisPage: React.FC = () => {
         <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-6">Hakediş Hazırla</h1>
 
         {message && (
-          <div
-            className={`mb-6 p-4 rounded-lg ${
-              message.type === 'success'
-                ? 'bg-green-50 border border-green-200 text-green-800'
-                : 'bg-red-50 border border-red-200 text-red-800'
-            }`}
-          >
-            {message.text}
-          </div>
+            <div className={`mb-4 p-4 rounded-md ${
+              message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 
+              message.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' :
+              'bg-blue-50 text-blue-700 border border-blue-200'
+            }`}>
+              {message.text}
+            </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Tarih ve Tip Seçimi */}
           <Card title="Genel Bilgiler">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -161,7 +197,6 @@ export const HakedisPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* Hat Listesi */}
           <Card title="Hat Bilgileri">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {ROUTES.filter(route => type === 'KREDI_KARTI' ? route !== 'Sanayi' : true).map((route) => (
@@ -178,7 +213,6 @@ export const HakedisPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* Araç Numaraları - Sadece Kredi Kartı için */}
           {type === 'KREDI_KARTI' && (
             <Card title="Araç Numaraları (Sanayi Hattı)">
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -197,7 +231,6 @@ export const HakedisPage: React.FC = () => {
             </Card>
           )}
 
-          {/* Raporal ve Sistem */}
           <Card title="Kontrol Bilgileri">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Input
@@ -223,7 +256,7 @@ export const HakedisPage: React.FC = () => {
               <Input
                 label="Fark"
                 type="text"
-                value={difference.toFixed(2)}
+                value={formatCurrency(difference)}
                 disabled
                 className={`font-semibold ${
                   difference > 0 ? 'text-green-600' : difference < 0 ? 'text-red-600' : 'text-gray-600'
@@ -232,10 +265,9 @@ export const HakedisPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* Submit Button */}
-          <div className="flex justify-end">
-            <Button type="submit" size="lg" disabled={loading}>
-              {loading ? 'Hazırlanıyor...' : 'Hakediş Hazırla'}
+          <div className="flex justify-end pt-4">
+            <Button type="submit" size="lg" disabled={loading || isFetching}>
+              {loading ? 'Kaydediliyor...' : existingRecordId ? 'GÜNCELLE' : 'KAYDET'}
             </Button>
           </div>
         </form>

@@ -34,6 +34,8 @@ export interface HakedisRecord {
   raporal: number;
   sistem: number;
   difference: number;
+  routes?: Record<string, number>;
+  vehicles?: Record<string, number>;
   createdBy: string;
   createdAt: string;
 }

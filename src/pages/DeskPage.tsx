@@ -3,9 +3,10 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Calendar, Send, Edit, RefreshCw } from 'lucide-react';
+import { Calendar, Edit, RefreshCw } from 'lucide-react';
 import { getErrorMessage } from '../utils/errorHandler';
 import { deskService } from '../services/deskService';
+import { formatCurrency } from '../utils/formatCurrency';
 import type { DeskRecord } from '../types';
 
 // Birim fiyatlar (sabit)
@@ -180,15 +181,7 @@ export const DeskPage: React.FC = () => {
     );
   };
 
-  // Bankaya gönder fonksiyonu
-  const handleSendToBank = (category: 'dolum' | 'kart' | 'vize') => {
-    const categoryTotal = calculateBanknoteTotal(category);
-    setBankSentCash({
-      ...bankSentCash,
-      [category]: categoryTotal
-    });
-    setMessage({ type: 'success', text: `${category.toUpperCase()} kategorisi için ₺${categoryTotal.toFixed(2)} bankaya gönderildi olarak işaretlendi. Kaydetmek için "Sorumluya Teslim Et" butonunu kullanın.` });
-  };
+
 
   // Kategori toplamları hesaplama
   const calculateDolumTotal = () => products.dolum * UNIT_PRICES.dolum;
@@ -246,6 +239,15 @@ export const DeskPage: React.FC = () => {
     setMessage(null);
 
     try {
+      // Otomatik olarak kupür toplamlarını bankSentCash'e yaz
+      const autoBankSentCash = {
+        dolum: calculateBanknoteTotal('dolum'),
+        kart: calculateBanknoteTotal('kart'),
+        vize: calculateBanknoteTotal('vize'),
+        totalSent: calculateBanknoteTotal('dolum') + calculateBanknoteTotal('kart') + calculateBanknoteTotal('vize')
+      };
+      setBankSentCash(autoBankSentCash);
+
       const submitData = {
         date,
         products,
@@ -256,7 +258,7 @@ export const DeskPage: React.FC = () => {
           ertesiGuneBirakilan: payments.ertesiGuneBirakilan
         },
         banknotes,
-        bankSentCash
+        bankSentCash: autoBankSentCash
       };
 
       if (editingRecordId) {
@@ -350,9 +352,9 @@ export const DeskPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="mt-2 text-sm text-gray-600">
-                      <span>Toplam: ₺{record.totals.totalSales.toFixed(2)}</span>
+                      <span>Toplam: {formatCurrency(record.totals.totalSales)}</span>
                       <span className="mx-2">•</span>
-                      <span>Fark: ₺{record.totals.difference.toFixed(2)}</span>
+                      <span>Fark: {formatCurrency(record.totals.difference)}</span>
                     </div>
                     {record.reviewNotes && (
                       <div className="mt-2 text-sm text-orange-600">
@@ -407,7 +409,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.dolum.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.dolum)}
                     disabled
                   />
                 </div>
@@ -415,7 +417,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.dolum * UNIT_PRICES.dolum).toFixed(2)}`}
+                    value={formatCurrency(products.dolum * UNIT_PRICES.dolum)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -439,7 +441,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.tamKart.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.tamKart)}
                     disabled
                   />
                 </div>
@@ -447,7 +449,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.tamKart * UNIT_PRICES.tamKart).toFixed(2)}`}
+                    value={formatCurrency(products.tamKart * UNIT_PRICES.tamKart)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -471,7 +473,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.indirimliKart.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.indirimliKart)}
                     disabled
                   />
                 </div>
@@ -479,7 +481,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.indirimliKart * UNIT_PRICES.indirimliKart).toFixed(2)}`}
+                    value={formatCurrency(products.indirimliKart * UNIT_PRICES.indirimliKart)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -503,7 +505,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.serbestKart.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.serbestKart)}
                     disabled
                   />
                 </div>
@@ -511,7 +513,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.serbestKart * UNIT_PRICES.serbestKart).toFixed(2)}`}
+                    value={formatCurrency(products.serbestKart * UNIT_PRICES.serbestKart)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -535,7 +537,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.serbestVize.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.serbestVize)}
                     disabled
                   />
                 </div>
@@ -543,7 +545,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.serbestVize * UNIT_PRICES.serbestVize).toFixed(2)}`}
+                    value={formatCurrency(products.serbestVize * UNIT_PRICES.serbestVize)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -567,7 +569,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.indirimliVize.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.indirimliVize)}
                     disabled
                   />
                 </div>
@@ -575,7 +577,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.indirimliVize * UNIT_PRICES.indirimliVize).toFixed(2)}`}
+                    value={formatCurrency(products.indirimliVize * UNIT_PRICES.indirimliVize)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -599,7 +601,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Birim Fiyat"
                     type="text"
-                    value={`₺${UNIT_PRICES.kartKilifi.toFixed(2)}`}
+                    value={formatCurrency(UNIT_PRICES.kartKilifi)}
                     disabled
                   />
                 </div>
@@ -607,7 +609,7 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="Toplam"
                     type="text"
-                    value={`₺${(products.kartKilifi * UNIT_PRICES.kartKilifi).toFixed(2)}`}
+                    value={formatCurrency(products.kartKilifi * UNIT_PRICES.kartKilifi)}
                     disabled
                     className="font-semibold text-green-600"
                   />
@@ -625,7 +627,7 @@ export const DeskPage: React.FC = () => {
                   <div>
                     <Input
                       type="text"
-                      value={`₺${totalSales.toFixed(2)}`}
+                      value={formatCurrency(totalSales)}
                       disabled
                       className="font-bold text-xl text-blue-600"
                     />
@@ -651,7 +653,7 @@ export const DeskPage: React.FC = () => {
                       <tr>
                         <td className="border border-gray-300 px-4 py-2 font-medium">DOLUM</td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
-                          ₺{calculateDolumTotal().toFixed(2)}
+                          {formatCurrency(calculateDolumTotal())}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
                           <input
@@ -665,35 +667,39 @@ export const DeskPage: React.FC = () => {
                           />
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right font-semibold text-green-600">
-                          ₺{calculateDolumCash().toFixed(2)}
+                          {formatCurrency(calculateDolumCash())}
                         </td>
                       </tr>
-                      {/* KART */}
+                      {/* KART / KART KILIFI (birleşik) */}
                       <tr>
-                        <td className="border border-gray-300 px-4 py-2 font-medium">KART</td>
+                        <td className="border border-gray-300 px-4 py-2 font-medium">KART / KART KILIFI</td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
-                          ₺{calculateKartTotal().toFixed(2)}
+                          {formatCurrency(calculateKartTotal() + calculateKartKilifiTotal())}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
                           <input
                             type="number"
                             step="0.01"
                             min="0"
-                            max={calculateKartTotal()}
+                            max={calculateKartTotal() + calculateKartKilifiTotal()}
                             className="w-full px-2 py-1 border border-gray-300 rounded text-right focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            value={categoryCreditCards.kart || ''}
-                            onChange={(e) => handleCategoryCreditCardChange('kart', e.target.value)}
+                            value={(categoryCreditCards.kart + categoryCreditCards.kartKilifi) || ''}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value) || 0;
+                              handleCategoryCreditCardChange('kart', e.target.value);
+                              setCategoryCreditCards(prev => ({ ...prev, kartKilifi: 0, kart: val }));
+                            }}
                           />
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right font-semibold text-green-600">
-                          ₺{calculateKartCash().toFixed(2)}
+                          {formatCurrency(calculateKartCash() + calculateKartKilifiCash())}
                         </td>
                       </tr>
                       {/* VİZE */}
                       <tr>
                         <td className="border border-gray-300 px-4 py-2 font-medium">VİZE</td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
-                          ₺{calculateVizeTotal().toFixed(2)}
+                          {formatCurrency(calculateVizeTotal())}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right">
                           <input
@@ -707,28 +713,7 @@ export const DeskPage: React.FC = () => {
                           />
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right font-semibold text-green-600">
-                          ₺{calculateVizeCash().toFixed(2)}
-                        </td>
-                      </tr>
-                      {/* KART KILIFI */}
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2 font-medium">KART KILIFI</td>
-                        <td className="border border-gray-300 px-4 py-2 text-right">
-                          ₺{calculateKartKilifiTotal().toFixed(2)}
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-right">
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            max={calculateKartKilifiTotal()}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-right focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            value={categoryCreditCards.kartKilifi || ''}
-                            onChange={(e) => handleCategoryCreditCardChange('kartKilifi', e.target.value)}
-                          />
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-right font-semibold text-green-600">
-                          ₺{calculateKartKilifiCash().toFixed(2)}
+                          {formatCurrency(calculateVizeCash())}
                         </td>
                       </tr>
                     </tbody>
@@ -736,13 +721,13 @@ export const DeskPage: React.FC = () => {
                       <tr className="bg-gray-200 font-bold">
                         <td className="border border-gray-300 px-4 py-2"></td>
                         <td className="border border-gray-300 px-4 py-2 text-right text-blue-600">
-                          ₺{totalSales.toFixed(2)}
+                          {formatCurrency(totalSales)}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right text-orange-700">
-                          ₺{calculateTotalCategoryCreditCard().toFixed(2)}
+                          {formatCurrency(calculateTotalCategoryCreditCard())}
                         </td>
                         <td className="border border-gray-300 px-4 py-2 text-right text-green-600">
-                          ₺{calculateTotalCategoryCash().toFixed(2)}
+                          {formatCurrency(calculateTotalCategoryCash())}
                         </td>
                       </tr>
                     </tfoot>
@@ -774,7 +759,7 @@ export const DeskPage: React.FC = () => {
                     }`}
                     onClick={() => setActiveTab('kart')}
                   >
-                    KART
+                    KART / KART KILIFI
                   </button>
                   <button
                     className={`px-3 sm:px-6 py-3 font-semibold transition-colors ${
@@ -791,10 +776,10 @@ export const DeskPage: React.FC = () => {
                 {/* Nakit Toplam Gösterimi */}
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                   <p className="text-sm text-blue-800">
-                    <strong>Nakit Toplam ({activeTab.toUpperCase()}):</strong> ₺
-                    {activeTab === 'dolum' && calculateDolumCash().toFixed(2)}
-                    {activeTab === 'kart' && calculateKartCash().toFixed(2)}
-                    {activeTab === 'vize' && calculateVizeCash().toFixed(2)}
+                    <strong>Nakit Toplam ({activeTab === 'kart' ? 'KART / KART KILIFI' : activeTab.toUpperCase()}):</strong>{' '}
+                    {activeTab === 'dolum' && formatCurrency(calculateDolumCash())}
+                    {activeTab === 'kart' && formatCurrency(calculateKartCash() + calculateKartKilifiCash())}
+                    {activeTab === 'vize' && formatCurrency(calculateVizeCash())}
                   </p>
                 </div>
 
@@ -814,7 +799,7 @@ export const DeskPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b200 * 200).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b200 * 200)}
                       </span>
                     </div>
                   </div>
@@ -832,7 +817,7 @@ export const DeskPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b100 * 100).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b100 * 100)}
                       </span>
                     </div>
                   </div>
@@ -850,7 +835,7 @@ export const DeskPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b50 * 50).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b50 * 50)}
                       </span>
                     </div>
                   </div>
@@ -868,7 +853,7 @@ export const DeskPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b20 * 20).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b20 * 20)}
                       </span>
                     </div>
                   </div>
@@ -886,7 +871,7 @@ export const DeskPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b10 * 10).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b10 * 10)}
                       </span>
                     </div>
                   </div>
@@ -904,7 +889,7 @@ export const DeskPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].b5 * 5).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].b5 * 5)}
                       </span>
                     </div>
                   </div>
@@ -922,7 +907,7 @@ export const DeskPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].c1 * 1).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].c1 * 1)}
                       </span>
                     </div>
                   </div>
@@ -940,7 +925,7 @@ export const DeskPage: React.FC = () => {
                         placeholder="Adet"
                       />
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        ₺{(banknotes[activeTab].c050 * 0.50).toFixed(2)}
+                        {formatCurrency(banknotes[activeTab].c050 * 0.50)}
                       </span>
                     </div>
                   </div>
@@ -952,14 +937,14 @@ export const DeskPage: React.FC = () => {
                     <div>
                       <p className="text-sm text-gray-600">Nakit Toplam (Ödeme Dağılımı)</p>
                       <p className="text-lg font-bold text-blue-600">
-                        ₺{activeTab === 'dolum' && calculateDolumCash().toFixed(2)}
-                        {activeTab === 'kart' && calculateKartCash().toFixed(2)}
-                        {activeTab === 'vize' && calculateVizeCash().toFixed(2)}
+                        {activeTab === 'dolum' && formatCurrency(calculateDolumCash())}
+                        {activeTab === 'kart' && formatCurrency(calculateKartCash() + calculateKartKilifiCash())}
+                        {activeTab === 'vize' && formatCurrency(calculateVizeCash())}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Banknot Sayımı Toplam</p>
-                      <p className="text-lg font-bold text-green-600">₺{calculateBanknoteTotal(activeTab).toFixed(2)}</p>
+                      <p className="text-lg font-bold text-green-600">{formatCurrency(calculateBanknoteTotal(activeTab))}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Fark</p>
@@ -970,11 +955,11 @@ export const DeskPage: React.FC = () => {
                            calculateVizeCash()) - calculateBanknoteTotal(activeTab)
                         ) < 0.01 ? 'text-green-600' : 'text-red-600'
                       }`}>
-                        ₺{(
+                        {formatCurrency(
                           (activeTab === 'dolum' ? calculateDolumCash() :
-                           activeTab === 'kart' ? calculateKartCash() :
+                           activeTab === 'kart' ? (calculateKartCash() + calculateKartKilifiCash()) :
                            calculateVizeCash()) - calculateBanknoteTotal(activeTab)
-                        ).toFixed(2)}
+                        )}
                       </p>
                     </div>
                   </div>
@@ -1002,17 +987,7 @@ export const DeskPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Bankaya Gönder Butonu */}
-                <div className="mt-4 flex flex-col sm:flex-row justify-end">
-                  <Button
-                    type="button"
-                    onClick={() => handleSendToBank(activeTab)}
-                    disabled={calculateBanknoteTotal(activeTab) === 0}
-                  >
-                    <Send className="w-5 h-5 mr-2" />
-                    BANKAYA GÖNDER ({activeTab.toUpperCase()})
-                  </Button>
-                </div>
+
 
                 {/* Bankaya Gönderilen Toplam */}
                 {(bankSentCash.dolum > 0 || bankSentCash.kart > 0 || bankSentCash.vize > 0) && (
@@ -1022,25 +997,25 @@ export const DeskPage: React.FC = () => {
                       {bankSentCash.dolum > 0 && (
                         <div>
                           <p className="text-sm text-gray-600">DOLUM</p>
-                          <p className="text-lg font-bold text-green-600">₺{bankSentCash.dolum.toFixed(2)}</p>
+                          <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.dolum)}</p>
                         </div>
                       )}
                       {bankSentCash.kart > 0 && (
                         <div>
                           <p className="text-sm text-gray-600">KART</p>
-                          <p className="text-lg font-bold text-green-600">₺{bankSentCash.kart.toFixed(2)}</p>
+                          <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.kart)}</p>
                         </div>
                       )}
                       {bankSentCash.vize > 0 && (
                         <div>
                           <p className="text-sm text-gray-600">VİZE</p>
-                          <p className="text-lg font-bold text-green-600">₺{bankSentCash.vize.toFixed(2)}</p>
+                          <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.vize)}</p>
                         </div>
                       )}
                       <div>
                         <p className="text-sm text-gray-600">TOPLAM</p>
                         <p className="text-lg font-bold text-green-600">
-                          ₺{(bankSentCash.dolum + bankSentCash.kart + bankSentCash.vize).toFixed(2)}
+                          {formatCurrency(bankSentCash.dolum + bankSentCash.kart + bankSentCash.vize)}
                         </p>
                       </div>
                     </div>
@@ -1065,7 +1040,7 @@ export const DeskPage: React.FC = () => {
                 <Input
                   label="KREDİ KARTI (Otomatik)"
                   type="text"
-                  value={`₺${calculateTotalCategoryCreditCard().toFixed(2)}`}
+                  value={formatCurrency(calculateTotalCategoryCreditCard())}
                   disabled
                   className="font-semibold text-orange-600"
                 />
@@ -1097,14 +1072,14 @@ export const DeskPage: React.FC = () => {
                   <Input
                     label="KASADA KALAN"
                     type="text"
-                    value={`₺${cashInRegister.toFixed(2)}`}
+                    value={formatCurrency(cashInRegister)}
                     disabled
                     className="font-bold text-lg text-purple-600"
                   />
                   <Input
                     label="FARK"
                     type="text"
-                    value={`₺${difference.toFixed(2)}`}
+                    value={formatCurrency(difference)}
                     disabled
                     className={`font-bold text-lg ${
                       difference > 0 ? 'text-green-600' : difference < 0 ? 'text-red-600' : 'text-gray-600'

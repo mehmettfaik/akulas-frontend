@@ -7,6 +7,7 @@ import type { WeeklyHakedisSummaryResponse } from '../types';
 import { Download, Calendar } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { getErrorMessage } from '../utils/errorHandler';
+import { formatCurrency } from '../utils/formatCurrency';
 
 export const WeeklyHakedisSummaryPage: React.FC = () => {
   const [startDate, setStartDate] = useState('');
@@ -146,7 +147,7 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
                     Toplam Haftalık
                   </h3>
                   <p className="text-xl md:text-3xl font-bold text-gray-900">
-                    {data.summary.totalHaftalik.toLocaleString('tr-TR')} ₺
+                    {formatCurrency(data.summary.totalHaftalik)}
                   </p>
                 </div>
               </Card>
@@ -157,7 +158,7 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
                     Toplam Kredi Kartı
                   </h3>
                   <p className="text-xl md:text-3xl font-bold text-gray-900">
-                    {data.summary.totalKrediKarti.toLocaleString('tr-TR')} ₺
+                    {formatCurrency(data.summary.totalKrediKarti)}
                   </p>
                 </div>
               </Card>
@@ -168,7 +169,7 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
                     Genel Toplam
                   </h3>
                   <p className="text-xl md:text-3xl font-bold text-primary-900">
-                    {data.summary.grandTotal.toLocaleString('tr-TR')} ₺
+                    {formatCurrency(data.summary.grandTotal)}
                   </p>
                 </div>
               </Card>
@@ -254,19 +255,19 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
                           {vehicle.taxId}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-mono">
-                          {vehicle.haftalik.routeAmount.toLocaleString('tr-TR')} ₺
+                          {formatCurrency(vehicle.haftalik.routeAmount)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-mono">
-                          {vehicle.haftalik.vehicleAmount.toLocaleString('tr-TR')} ₺
+                          {formatCurrency(vehicle.haftalik.vehicleAmount)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-semibold font-mono">
-                          {vehicle.haftalik.totalAmount.toLocaleString('tr-TR')} ₺
+                          {formatCurrency(vehicle.haftalik.totalAmount)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-mono">
-                          {vehicle.krediKarti.totalAmount.toLocaleString('tr-TR')} ₺
+                          {formatCurrency(vehicle.krediKarti.totalAmount)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-bold font-mono bg-yellow-50">
-                          {vehicle.grandTotal.toLocaleString('tr-TR')} ₺
+                          {formatCurrency(vehicle.grandTotal)}
                         </td>
                       </tr>
                     ))}
@@ -277,13 +278,13 @@ export const WeeklyHakedisSummaryPage: React.FC = () => {
                         TOPLAM
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-mono">
-                        {data.summary.totalHaftalik.toLocaleString('tr-TR')} ₺
+                        {formatCurrency(data.summary.totalHaftalik)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-mono">
-                        {data.summary.totalKrediKarti.toLocaleString('tr-TR')} ₺
+                        {formatCurrency(data.summary.totalKrediKarti)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 font-mono bg-yellow-100">
-                        {data.summary.grandTotal.toLocaleString('tr-TR')} ₺
+                        {formatCurrency(data.summary.grandTotal)}
                       </td>
                     </tr>
                   </tfoot>

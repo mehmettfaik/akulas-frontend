@@ -8,6 +8,7 @@ import { vehicleService } from '../services/vehicleService';
 import type { Vehicle, VehicleReportResponse, RouteReportResponse, SummaryReportResponse, DateRangeReportResponse } from '../types';
 import { Search } from 'lucide-react';
 import { getErrorMessage } from '../utils/errorHandler';
+import { formatCurrency } from '../utils/formatCurrency';
 
 type ReportType = 'vehicle' | 'route' | 'summary' | 'dateRange';
 
@@ -237,19 +238,19 @@ export const ReportsPage: React.FC = () => {
               <div className="bg-green-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Toplam Hakediş</p>
                 <p className="text-lg md:text-2xl font-bold text-green-600">
-                  ₺{vehicleReport.summary.totalAmount.toFixed(2)}
+                  {formatCurrency(vehicleReport.summary.totalAmount)}
                 </p>
               </div>
               <div className="bg-purple-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Hat Bazlı</p>
                 <p className="text-lg md:text-2xl font-bold text-purple-600">
-                  ₺{vehicleReport.summary.totalRouteAmount.toFixed(2)}
+                  {formatCurrency(vehicleReport.summary.totalRouteAmount)}
                 </p>
               </div>
               <div className="bg-orange-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Kredi Kartı</p>
                 <p className="text-lg md:text-2xl font-bold text-orange-600">
-                  ₺{vehicleReport.summary.totalVehicleAmount.toFixed(2)}
+                  {formatCurrency(vehicleReport.summary.totalVehicleAmount)}
                 </p>
               </div>
             </div>
@@ -271,13 +272,13 @@ export const ReportsPage: React.FC = () => {
                         {new Date(report.date).toLocaleDateString('tr-TR')}
                       </td>
                       <td className="py-3 px-4 text-right text-purple-600">
-                        ₺{report.routeAmount.toFixed(2)}
+                        {formatCurrency(report.routeAmount)}
                       </td>
                       <td className="py-3 px-4 text-right text-orange-600">
-                        ₺{report.vehicleAmount.toFixed(2)}
+                        {formatCurrency(report.vehicleAmount)}
                       </td>
                       <td className="py-3 px-4 text-right font-bold text-green-600">
-                        ₺{report.totalAmount.toFixed(2)}
+                        {formatCurrency(report.totalAmount)}
                       </td>
                       <td className="py-3 px-4">
                         {report.types.map(type => (
@@ -300,13 +301,13 @@ export const ReportsPage: React.FC = () => {
                   <tr className="border-t-2 border-gray-300 bg-gray-50">
                     <th className="py-3 px-4 text-left font-bold">TOPLAM</th>
                     <th className="py-3 px-4 text-right font-bold text-purple-600">
-                      ₺{vehicleReport.summary.totalRouteAmount.toFixed(2)}
+                      {formatCurrency(vehicleReport.summary.totalRouteAmount)}
                     </th>
                     <th className="py-3 px-4 text-right font-bold text-orange-600">
-                      ₺{vehicleReport.summary.totalVehicleAmount.toFixed(2)}
+                      {formatCurrency(vehicleReport.summary.totalVehicleAmount)}
                     </th>
                     <th className="py-3 px-4 text-right font-bold text-green-600 text-lg">
-                      ₺{vehicleReport.summary.totalAmount.toFixed(2)}
+                      {formatCurrency(vehicleReport.summary.totalAmount)}
                     </th>
                     <th></th>
                   </tr>
@@ -325,19 +326,19 @@ export const ReportsPage: React.FC = () => {
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Toplam Hakediş</p>
                   <p className="text-lg md:text-2xl font-bold text-green-600">
-                    ₺{routeReport.summary.totalAmount.toFixed(2)}
+                    {formatCurrency(routeReport.summary.totalAmount)}
                   </p>
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Hat Bazlı</p>
                   <p className="text-lg md:text-2xl font-bold text-purple-600">
-                    ₺{routeReport.summary.totalRouteAmount.toFixed(2)}
+                    {formatCurrency(routeReport.summary.totalRouteAmount)}
                   </p>
                 </div>
                 <div className="bg-orange-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Kredi Kartı</p>
                   <p className="text-lg md:text-2xl font-bold text-orange-600">
-                    ₺{routeReport.summary.totalVehicleAmount.toFixed(2)}
+                    {formatCurrency(routeReport.summary.totalVehicleAmount)}
                   </p>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-lg">
@@ -378,13 +379,13 @@ export const ReportsPage: React.FC = () => {
                         {new Date(report.date).toLocaleDateString('tr-TR')}
                       </td>
                       <td className="py-3 px-4 text-right text-purple-600">
-                        ₺{report.routeAmount.toFixed(2)}
+                        {formatCurrency(report.routeAmount)}
                       </td>
                       <td className="py-3 px-4 text-right text-orange-600">
-                        ₺{report.vehicleAmount.toFixed(2)}
+                        {formatCurrency(report.vehicleAmount)}
                       </td>
                       <td className="py-3 px-4 text-right font-bold text-green-600">
-                        ₺{report.totalAmount.toFixed(2)}
+                        {formatCurrency(report.totalAmount)}
                       </td>
                       <td className="py-3 px-4 text-center">{report.vehicleCount}</td>
                     </tr>
@@ -394,13 +395,13 @@ export const ReportsPage: React.FC = () => {
                   <tr className="border-t-2 border-gray-300 bg-gray-50">
                     <th className="py-3 px-4 text-left font-bold">TOPLAM</th>
                     <th className="py-3 px-4 text-right font-bold text-purple-600">
-                      ₺{routeReport.summary.totalRouteAmount.toFixed(2)}
+                      {formatCurrency(routeReport.summary.totalRouteAmount)}
                     </th>
                     <th className="py-3 px-4 text-right font-bold text-orange-600">
-                      ₺{routeReport.summary.totalVehicleAmount.toFixed(2)}
+                      {formatCurrency(routeReport.summary.totalVehicleAmount)}
                     </th>
                     <th className="py-3 px-4 text-right font-bold text-green-600 text-lg">
-                      ₺{routeReport.summary.totalAmount.toFixed(2)}
+                      {formatCurrency(routeReport.summary.totalAmount)}
                     </th>
                     <th className="py-3 px-4 text-center font-bold">
                       {routeReport.summary.vehicleCount}
@@ -426,13 +427,13 @@ export const ReportsPage: React.FC = () => {
                   <div className="bg-green-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Raporal</p>
                     <p className="text-lg md:text-2xl font-bold text-green-600">
-                      ₺{summaryReport.total.raporal.toFixed(2)}
+                      {formatCurrency(summaryReport.total.raporal)}
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Sistem</p>
                     <p className="text-lg md:text-2xl font-bold text-purple-600">
-                      ₺{summaryReport.total.sistem.toFixed(2)}
+                      {formatCurrency(summaryReport.total.sistem)}
                     </p>
                   </div>
                   <div className="bg-orange-50 p-4 rounded-lg">
@@ -440,7 +441,7 @@ export const ReportsPage: React.FC = () => {
                     <p className={`text-2xl font-bold ${
                       summaryReport.total.difference >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      ₺{summaryReport.total.difference.toFixed(2)}
+                      {formatCurrency(summaryReport.total.difference)}
                     </p>
                   </div>
                 </div>
@@ -456,13 +457,13 @@ export const ReportsPage: React.FC = () => {
                   <div className="bg-green-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Raporal</p>
                     <p className="text-base md:text-xl font-bold text-green-600">
-                      ₺{summaryReport.weekly.raporal.toFixed(2)}
+                      {formatCurrency(summaryReport.weekly.raporal)}
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Sistem</p>
                     <p className="text-base md:text-xl font-bold text-purple-600">
-                      ₺{summaryReport.weekly.sistem.toFixed(2)}
+                      {formatCurrency(summaryReport.weekly.sistem)}
                     </p>
                   </div>
                   <div className="bg-orange-50 p-4 rounded-lg">
@@ -470,7 +471,7 @@ export const ReportsPage: React.FC = () => {
                     <p className={`text-xl font-bold ${
                       summaryReport.weekly.difference >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      ₺{summaryReport.weekly.difference.toFixed(2)}
+                      {formatCurrency(summaryReport.weekly.difference)}
                     </p>
                   </div>
                 </div>
@@ -486,13 +487,13 @@ export const ReportsPage: React.FC = () => {
                   <div className="bg-green-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Raporal</p>
                     <p className="text-base md:text-xl font-bold text-green-600">
-                      ₺{summaryReport.creditCard.raporal.toFixed(2)}
+                      {formatCurrency(summaryReport.creditCard.raporal)}
                     </p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-600">Sistem</p>
                     <p className="text-base md:text-xl font-bold text-purple-600">
-                      ₺{summaryReport.creditCard.sistem.toFixed(2)}
+                      {formatCurrency(summaryReport.creditCard.sistem)}
                     </p>
                   </div>
                   <div className="bg-orange-50 p-4 rounded-lg">
@@ -500,7 +501,7 @@ export const ReportsPage: React.FC = () => {
                     <p className={`text-xl font-bold ${
                       summaryReport.creditCard.difference >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      ₺{summaryReport.creditCard.difference.toFixed(2)}
+                      {formatCurrency(summaryReport.creditCard.difference)}
                     </p>
                   </div>
                 </div>
@@ -520,13 +521,13 @@ export const ReportsPage: React.FC = () => {
               <div className="bg-green-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Toplam Raporal</p>
                 <p className="text-lg md:text-2xl font-bold text-green-600">
-                  ₺{dateRangeReport.totals.totalRaporal.toFixed(2)}
+                  {formatCurrency(dateRangeReport.totals.totalRaporal)}
                 </p>
               </div>
               <div className="bg-purple-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Toplam Sistem</p>
                 <p className="text-lg md:text-2xl font-bold text-purple-600">
-                  ₺{dateRangeReport.totals.totalSystem.toFixed(2)}
+                  {formatCurrency(dateRangeReport.totals.totalSystem)}
                 </p>
               </div>
               <div className="bg-orange-50 p-4 rounded-lg">
@@ -534,7 +535,7 @@ export const ReportsPage: React.FC = () => {
                 <p className={`text-2xl font-bold ${
                   dateRangeReport.totals.totalDifference >= 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
-                  ₺{dateRangeReport.totals.totalDifference.toFixed(2)}
+                  {formatCurrency(dateRangeReport.totals.totalDifference)}
                 </p>
               </div>
             </div>
@@ -567,15 +568,15 @@ export const ReportsPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right text-green-600">
-                        ₺{record.raporal.toFixed(2)}
+                        {formatCurrency(record.raporal)}
                       </td>
                       <td className="py-3 px-4 text-right text-purple-600">
-                        ₺{record.sistem.toFixed(2)}
+                        {formatCurrency(record.sistem)}
                       </td>
                       <td className={`py-3 px-4 text-right font-bold ${
                         record.difference >= 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
-                        ₺{record.difference.toFixed(2)}
+                        {formatCurrency(record.difference)}
                       </td>
                     </tr>
                   ))}
@@ -584,15 +585,15 @@ export const ReportsPage: React.FC = () => {
                   <tr className="border-t-2 border-gray-300 bg-gray-50">
                     <th colSpan={2} className="py-3 px-4 text-left font-bold">TOPLAM</th>
                     <th className="py-3 px-4 text-right font-bold text-green-600">
-                      ₺{dateRangeReport.totals.totalRaporal.toFixed(2)}
+                      {formatCurrency(dateRangeReport.totals.totalRaporal)}
                     </th>
                     <th className="py-3 px-4 text-right font-bold text-purple-600">
-                      ₺{dateRangeReport.totals.totalSystem.toFixed(2)}
+                      {formatCurrency(dateRangeReport.totals.totalSystem)}
                     </th>
                     <th className={`py-3 px-4 text-right font-bold text-lg ${
                       dateRangeReport.totals.totalDifference >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      ₺{dateRangeReport.totals.totalDifference.toFixed(2)}
+                      {formatCurrency(dateRangeReport.totals.totalDifference)}
                     </th>
                   </tr>
                 </tfoot>

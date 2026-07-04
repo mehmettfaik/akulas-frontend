@@ -20,7 +20,7 @@ interface BanknoteDenominations {
 export interface PusulaRecord {
   id: string;
   date: string;
-  type: 'desk' | 'bayi';
+  type: 'desk' | 'bayi' | 'kiosk';
   bankSentCash: { dolum?: number; kart?: number; vize?: number; };
   banknotes?: {
     dolum?: BanknoteDenominations;
@@ -38,7 +38,7 @@ export function generatePusulaExcel(record: PusulaRecord): void {
   rows.push(['BANKA PUSULA RAPORU']);
   rows.push([]);
   rows.push(['Tarih:', new Date(record.date).toLocaleDateString('tr-TR')]);
-  rows.push(['Tip:', record.type === 'desk' ? 'Desk İşlemleri' : 'Bayi Dolum']);
+  rows.push(['Tip:', record.type === 'desk' ? 'Desk İşlemleri' : record.type === 'bayi' ? 'Bayi Dolum' : 'Kiosk Dolum']);
   rows.push(['Gönderen:', record.submittedByEmail]);
   rows.push([]);
 
@@ -99,8 +99,8 @@ export function generatePusulaExcel(record: PusulaRecord): void {
   XLSX.utils.book_append_sheet(wb, ws, 'Pusula');
 
   const dateStr = record.date.replace(/-/g, '');
-  const typeStr = record.type === 'desk' ? 'Desk' : 'BayiDolum';
-  XLSX.writeFile(wb, `Pusula_${typeStr}_${dateStr}.xlsx`);
+  const typeStr = record.type === 'desk' ? 'Desk' : record.type === 'bayi' ? 'BayiDolum' : 'KioskDolum';
+  XLSX.writeFile(wb, `Banka_Pusulasi_${typeStr}_${dateStr}.xlsx`);
 }
 
 export function generateBulkPusulaExcel(records: PusulaRecord[]): void {
@@ -124,7 +124,7 @@ export function generateBulkPusulaExcel(records: PusulaRecord[]): void {
   let grandTotalVize = 0;
 
   records.forEach((record, index) => {
-    const typeLabel = record.type === 'desk' ? 'Desk İşlemleri' : 'Bayi Dolum';
+    const typeLabel = record.type === 'desk' ? 'Desk İşlemleri' : record.type === 'bayi' ? 'Bayi Dolum' : 'Kiosk Dolum';
     const dateLabel = new Date(record.date).toLocaleDateString('tr-TR');
 
     rows.push(['════════════════════════════════════════']);

@@ -15,7 +15,8 @@ import {
   Landmark,
   DollarSign,
   Calendar,
-  X
+  X,
+  MonitorSmartphone
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -25,12 +26,14 @@ const menuItems = [
   // DESK specific
   { name: 'Desk İşlemleri', path: '/desk', icon: Calculator, roles: ['desk'] },
   { name: 'Bayi Dolum', path: '/bayi-dolum', icon: Store, roles: ['desk'] },
+  { name: 'Kiosk Dolum', path: '/kiosk-dolum', icon: MonitorSmartphone, roles: ['desk', 'responsible', 'admin'] },
 
   // RESPONSIBLE
   { name: 'Sorumluya Teslim Edilen', path: '/desk-submitted', icon: FileCheck, roles: ['desk', 'responsible', 'admin'] },
   { name: 'Bankaya Gönderilen', path: '/bankaya-gonderilen', icon: DollarSign, roles: ['desk', 'responsible', 'admin'] },
 
   // ADMIN only
+  { name: 'İşletim Formları', path: '/admin-isletim-formlari', icon: FileText, roles: ['admin'] },
   { name: 'Hakediş', path: '/hakedis', icon: FileText, roles: ['admin'] },
   { name: 'Haftalık Özet (Banka)', path: '/hakedis/weekly-summary', icon: Landmark, roles: ['admin'] },
   { name: 'Cari Yönetimi', path: '/vehicles', icon: Truck, roles: ['admin'] },
