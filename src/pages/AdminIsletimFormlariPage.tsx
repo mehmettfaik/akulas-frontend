@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../components/layout/MainLayout';
 import { Card } from '../components/ui/Card';
-import { Calendar, Search } from 'lucide-react';
+import { Calendar, Search, Printer } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
+import { generateDeskPdf, generateBayiDolumPdf, generateKioskDolumPdf } from '../utils/pdfGenerator';
 import { deskService } from '../services/deskService';
 import { bayiDolumService } from '../services/bayiDolumService';
 import { kioskDolumService } from '../services/kioskDolumService';
@@ -93,11 +94,12 @@ export const AdminIsletimFormlariPage: React.FC = () => {
           <th className="py-3 px-4 font-semibold text-right">Nakit</th>
           <th className="py-3 px-4 font-semibold text-right">Fark</th>
           <th className="py-3 px-4 font-semibold text-center">Durum</th>
+          <th className="py-3 px-4 font-semibold text-center">İşletim Formu</th>
         </tr>
       </thead>
       <tbody>
         {records.length === 0 ? (
-          <tr><td colSpan={type === 'kiosk' ? 7 : 6} className="text-center py-6 text-gray-500">Kayıt bulunamadı.</td></tr>
+          <tr><td colSpan={type === 'kiosk' ? 8 : 7} className="text-center py-6 text-gray-500">Kayıt bulunamadı.</td></tr>
         ) : (
           records.map(record => (
             <tr key={record.id} className="border-b hover:bg-gray-50">
@@ -118,6 +120,23 @@ export const AdminIsletimFormlariPage: React.FC = () => {
               </td>
               <td className="py-3 px-4 text-center">
                 {getStatusBadge(record.status)}
+              </td>
+              <td className="py-3 px-4 text-center">
+                <button
+                  onClick={() => {
+                    if (type === 'desk') {
+                      generateDeskPdf(record);
+                    } else if (type === 'bayi') {
+                      generateBayiDolumPdf(record);
+                    } else {
+                      generateKioskDolumPdf(record);
+                    }
+                  }}
+                  className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                  <Printer className="w-3 h-3 mr-1" />
+                  PDF
+                </button>
               </td>
             </tr>
           ))

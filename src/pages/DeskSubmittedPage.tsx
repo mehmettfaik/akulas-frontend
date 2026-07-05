@@ -9,12 +9,14 @@ import axios from 'axios';
 import apiClient from '../services/api';
 import { deskService } from '../services/deskService';
 import { bayiDolumService } from '../services/bayiDolumService';
+import { kioskDolumService } from '../services/kioskDolumService';
+import type { KioskDolumRecord } from '../services/kioskDolumService';
 import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/errorHandler';
-import { generateDeskPdf, generateBayiDolumPdf } from '../utils/pdfGenerator';
+import { generateDeskPdf, generateBayiDolumPdf, generateKioskDolumPdf } from '../utils/pdfGenerator';
 import { formatCurrency } from '../utils/formatCurrency';
 
-type CombinedRecord = (DeskRecord | BayiDolumRecord) & { recordType: 'desk' | 'bayi' };
+type CombinedRecord = (DeskRecord | BayiDolumRecord | KioskDolumRecord) & { recordType: 'desk' | 'bayi' | 'kiosk' };
 
 export const DeskSubmittedPage: React.FC = () => {
   const { user } = useAuth();
@@ -25,7 +27,7 @@ export const DeskSubmittedPage: React.FC = () => {
   const [selectedRecord, setSelectedRecord] = useState<CombinedRecord | null>(null);
   const [reviewNotes, setReviewNotes] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'desk' | 'bayi'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'desk' | 'bayi' | 'kiosk'>('all');
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
@@ -35,16 +37,18 @@ export const DeskSubmittedPage: React.FC = () => {
         params.status = statusFilter;
       }
 
-      // Her iki endpoint'ten paralel veri çek
-      const [deskRes, bayiRes] = await Promise.all([
+      // Tüm endpoint'lerden paralel veri çek
+      const [deskRes, bayiRes, kioskRes] = await Promise.all([
         apiClient.get('/desk/submitted', { params }),
-        apiClient.get('/bayi-dolum/submitted', { params })
+        apiClient.get('/bayi-dolum/submitted', { params }),
+        apiClient.get('/kiosk-dolum/submitted', { params })
       ]);
 
       // Birleştir ve tip ekle
       const allRecords: CombinedRecord[] = [
         ...(deskRes.data.data || []).map((r: DeskRecord) => ({ ...r, recordType: 'desk' as const })),
-        ...(bayiRes.data.data || []).map((r: BayiDolumRecord) => ({ ...r, recordType: 'bayi' as const }))
+        ...(bayiRes.data.data || []).map((r: BayiDolumRecord) => ({ ...r, recordType: 'bayi' as const })),
+        ...(kioskRes.data.data || []).map((r: KioskDolumRecord) => ({ ...r, recordType: 'kiosk' as const }))
       ];
 
       // Tarihe göre sırala (en yeni önce)
@@ -80,8 +84,10 @@ export const DeskSubmittedPage: React.FC = () => {
       // Kayıt tipine göre doğru servisi kullan
       if (selectedRecord?.recordType === 'desk') {
         await deskService.review(recordId, action, reviewNotes || undefined);
-      } else {
+      } else if (selectedRecord?.recordType === 'bayi') {
         await bayiDolumService.review(recordId, action, reviewNotes || undefined);
+      } else {
+        await kioskDolumService.review(recordId, action, reviewNotes || undefined);
       }
       
       alert(`Kayıt başarıyla ${action === 'approve' ? 'onaylandı' : action === 'revise' ? 'revize edildi' : 'reddedildi'}!`);
@@ -152,11 +158,12 @@ export const DeskSubmittedPage: React.FC = () => {
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value as 'all' | 'desk' | 'bayi')}
+                  onChange={(e) => setTypeFilter(e.target.value as 'all' | 'desk' | 'bayi' | 'kiosk')}
                 >
                   <option value="all">Tümü</option>
                   <option value="desk">Desk</option>
                   <option value="bayi">Bayi Dolum</option>
+                  <option value="kiosk">Kiosk Dolum</option>
                 </select>
               </div>
               <div>
@@ -219,9 +226,11 @@ export const DeskSubmittedPage: React.FC = () => {
                         <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
                           record.recordType === 'desk' 
                             ? 'bg-blue-100 text-blue-800' 
-                            : 'bg-purple-100 text-purple-800'
+                            : record.recordType === 'bayi'
+                            ? 'bg-purple-100 text-purple-800'
+                            : 'bg-orange-100 text-orange-800'
                         }`}>
-                          {record.recordType === 'desk' ? 'DESK' : 'BAYİ DOLUM'}
+                          {record.recordType === 'desk' ? 'DESK' : record.recordType === 'bayi' ? 'BAYİ DOLUM' : 'KİOSK DOLUM'}
                         </span>
                       </td>
                       <td className="py-3 px-4">
@@ -245,7 +254,7 @@ export const DeskSubmittedPage: React.FC = () => {
                         ₺{record.totals.difference.toFixed(2)}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {getStatusBadge(record.status)}
+                        {getStatusBadge(record.status || 'submitted')}
                       </td>
                       <td className="py-3 px-4 text-center">
                         <Button
@@ -254,8 +263,10 @@ export const DeskSubmittedPage: React.FC = () => {
                           onClick={() => {
                             if (record.recordType === 'desk') {
                               generateDeskPdf(record as DeskRecord);
-                            } else {
+                            } else if (record.recordType === 'bayi') {
                               generateBayiDolumPdf(record as BayiDolumRecord);
+                            } else {
+                              generateKioskDolumPdf(record as KioskDolumRecord);
                             }
                           }}
                         >
@@ -287,7 +298,7 @@ export const DeskSubmittedPage: React.FC = () => {
               <div className="p-6">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
                   <h2 className="text-lg md:text-2xl font-bold">
-                    {selectedRecord.recordType === 'desk' ? 'Desk' : 'Bayi Dolum'} Kayıt Detayı - {new Date(selectedRecord.date).toLocaleDateString('tr-TR')}
+                    {selectedRecord.recordType === 'desk' ? 'Desk' : selectedRecord.recordType === 'bayi' ? 'Bayi Dolum' : 'Kiosk Dolum'} Kayıt Detayı - {new Date(selectedRecord.date).toLocaleDateString('tr-TR')}
                   </h2>
                     <div className="flex items-center gap-2">
                       {selectedRecord.recordType === 'desk' && (
@@ -295,6 +306,28 @@ export const DeskSubmittedPage: React.FC = () => {
                           variant="secondary"
                           size="sm"
                           onClick={() => generateDeskPdf(selectedRecord as DeskRecord)}
+                          className="mr-4"
+                        >
+                          <Printer className="w-4 h-4 mr-2" />
+                          PDF İNDİR
+                        </Button>
+                      )}
+                      {selectedRecord.recordType === 'bayi' && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => generateBayiDolumPdf(selectedRecord as BayiDolumRecord)}
+                          className="mr-4"
+                        >
+                          <Printer className="w-4 h-4 mr-2" />
+                          PDF İNDİR
+                        </Button>
+                      )}
+                      {selectedRecord.recordType === 'kiosk' && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => generateKioskDolumPdf(selectedRecord as KioskDolumRecord)}
                           className="mr-4"
                         >
                           <Printer className="w-4 h-4 mr-2" />
@@ -373,6 +406,19 @@ export const DeskSubmittedPage: React.FC = () => {
                     </div>
                   )}
 
+                  {/* Ürün Satışları - Kiosk Dolum için */}
+                  {selectedRecord.recordType === 'kiosk' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3">Ürün Satışları</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="bg-gray-50 p-3 rounded">
+                          <p className="text-sm text-gray-600">Kiosk Dolum</p>
+                          <p className="text-lg font-semibold">{(selectedRecord as KioskDolumRecord).products.dolum}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Ödeme Dağılımı - Desk için */}
                   {selectedRecord.recordType === 'desk' && 'vize' in selectedRecord.categoryCreditCards && (
                     <div>
@@ -409,11 +455,25 @@ export const DeskSubmittedPage: React.FC = () => {
                         </div>
                         <div className="bg-orange-50 p-3 rounded">
                           <p className="text-sm text-gray-600">Kart KK</p>
-                          <p className="text-lg font-semibold text-orange-600">₺{selectedRecord.categoryCreditCards.kart.toFixed(2)}</p>
+                          <p className="text-lg font-semibold text-orange-600">₺{((selectedRecord as BayiDolumRecord).categoryCreditCards.kart || 0).toFixed(2)}</p>
                         </div>
                       </div>
                     </div>
                   )}
+
+                  {/* Ödeme Dağılımı - Kiosk Dolum için */}
+                  {selectedRecord.recordType === 'kiosk' && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3">Ödeme Dağılımı</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-orange-50 p-3 rounded">
+                          <p className="text-sm text-gray-600">Dolum KK</p>
+                          <p className="text-lg font-semibold text-orange-600">₺{selectedRecord.categoryCreditCards.dolum.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
 
                   {/* Hesaplamalar */}
                   <div>
@@ -701,11 +761,14 @@ export const DeskSubmittedPage: React.FC = () => {
                       <div>
                         <p className="text-sm text-gray-600">Teslim Tarihi</p>
                         <p className="text-lg font-semibold">
-                          {new Date(selectedRecord.submittedAt).toLocaleString('tr-TR')}
+                          {selectedRecord.submittedAt 
+                            ? new Date(selectedRecord.submittedAt).toLocaleString('tr-TR')
+                            : 'Bilinmiyor'}
                         </p>
                       </div>
                       <div>
-                        {getStatusBadge(selectedRecord.status)}
+                        <p className="text-sm text-gray-600">Durum</p>
+                        {getStatusBadge(selectedRecord.status || 'submitted')}
                       </div>
                     </div>
                   </div>

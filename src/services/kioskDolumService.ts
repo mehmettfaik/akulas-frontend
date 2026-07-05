@@ -13,12 +13,22 @@ export interface KioskDolumRecord {
   products: { dolum: number };
   categoryCreditCards: { dolum: number };
   payments: { gunbasiNakit: number; krediKarti: number; bankayaGonderilen: number; ertesiGuneBirakilan: number };
-  banknotes: { dolum: BanknoteCount };
+  banknotes: { 
+    dolum: BanknoteCount;
+    kart?: BanknoteCount;
+    vize?: BanknoteCount;
+  };
   bankSentCash: { dolum: number; totalSent: number };
   totals: { totalSales: number; totalCreditCard: number; expectedCash: number; cashInRegister: number; difference: number; totalCash: number };
   status?: 'pending' | 'approved' | 'rejected' | 'pending_revision' | 'teslim_edildi';
+  submittedBy?: string;
   submittedByEmail?: string;
-  reviewerNotes?: string;
+  submittedAt?: string;
+  reviewedByEmail?: string;
+  reviewedByRole?: string;
+  reviewAction?: string;
+  reviewedAt?: string;
+  reviewNotes?: string;
 }
 
 export const kioskDolumService = {

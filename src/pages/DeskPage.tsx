@@ -951,7 +951,7 @@ export const DeskPage: React.FC = () => {
                       <p className={`text-lg font-bold ${
                         Math.abs(
                           (activeTab === 'dolum' ? calculateDolumCash() :
-                           activeTab === 'kart' ? calculateKartCash() :
+                           activeTab === 'kart' ? (calculateKartCash() + calculateKartKilifiCash()) :
                            calculateVizeCash()) - calculateBanknoteTotal(activeTab)
                         ) < 0.01 ? 'text-green-600' : 'text-red-600'
                       }`}>
@@ -965,7 +965,7 @@ export const DeskPage: React.FC = () => {
                   </div>
                   {Math.abs(
                     (activeTab === 'dolum' ? calculateDolumCash() :
-                     activeTab === 'kart' ? calculateKartCash() :
+                     activeTab === 'kart' ? (calculateKartCash() + calculateKartKilifiCash()) :
                      calculateVizeCash()) - calculateBanknoteTotal(activeTab)
                   ) >= 0.01 && (
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
@@ -976,7 +976,7 @@ export const DeskPage: React.FC = () => {
                   )}
                   {Math.abs(
                     (activeTab === 'dolum' ? calculateDolumCash() :
-                     activeTab === 'kart' ? calculateKartCash() :
+                     activeTab === 'kart' ? (calculateKartCash() + calculateKartKilifiCash()) :
                      calculateVizeCash()) - calculateBanknoteTotal(activeTab)
                   ) < 0.01 && (
                     <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
