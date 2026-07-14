@@ -10,7 +10,10 @@ import {
   Settings, 
   Calculator,
   FileCheck,
-  Store
+  Store,
+  MonitorSmartphone,
+  DollarSign,
+  Calendar
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -62,6 +65,46 @@ const pages: PageCard[] = [
     icon: FileCheck,
     path: '/desk-submitted',
     roles: ['desk', 'responsible', 'admin'],
+    color: 'bg-gray-500'
+  },
+  {
+    title: 'Kiosk Dolum',
+    description: 'Kiosk dolum ve para sayım işlemlerini yapın',
+    icon: MonitorSmartphone,
+    path: '/kiosk-dolum',
+    roles: ['desk', 'responsible'],
+    color: 'bg-gray-500'
+  },
+  {
+    title: 'Kiosk Ekle/Çıkar',
+    description: 'Sistemdeki kiosk cihazlarını yönetin',
+    icon: MonitorSmartphone,
+    path: '/kiosk-dolum',
+    roles: ['admin'],
+    color: 'bg-gray-500'
+  },
+  {
+    title: 'Bankaya Gönderilen',
+    description: 'Bankaya gönderilen kayıtları görüntüleyin ve yönetin',
+    icon: DollarSign,
+    path: '/bankaya-gonderilen',
+    roles: ['desk', 'responsible', 'admin'],
+    color: 'bg-gray-500'
+  },
+  {
+    title: 'İşletim Formları',
+    description: 'Tüm işletim formlarını ve detaylarını görüntüleyin',
+    icon: FileText,
+    path: '/admin-isletim-formlari',
+    roles: ['admin'],
+    color: 'bg-gray-500'
+  },
+  {
+    title: 'Yıllık İzin',
+    description: 'Personel yıllık izinlerini yönetin',
+    icon: Calendar,
+    path: '/leave',
+    roles: ['admin'],
     color: 'bg-gray-500'
   },
   {

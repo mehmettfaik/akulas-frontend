@@ -26,7 +26,8 @@ const menuItems = [
   // DESK specific
   { name: 'Desk İşlemleri', path: '/desk', icon: Calculator, roles: ['desk'] },
   { name: 'Bayi Dolum', path: '/bayi-dolum', icon: Store, roles: ['desk'] },
-  { name: 'Kiosk Dolum', path: '/kiosk-dolum', icon: MonitorSmartphone, roles: ['desk', 'responsible', 'admin'] },
+  { name: 'Kiosk Dolum', path: '/kiosk-dolum', icon: MonitorSmartphone, roles: ['desk', 'responsible'] },
+  { name: 'Kiosk Ekle/Çıkar', path: '/kiosk-dolum', icon: MonitorSmartphone, roles: ['admin'] },
 
   // RESPONSIBLE
   { name: 'Sorumluya Teslim Edilen', path: '/desk-submitted', icon: FileCheck, roles: ['desk', 'responsible', 'admin'] },

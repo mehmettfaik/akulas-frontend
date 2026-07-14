@@ -77,8 +77,11 @@ export const AdminIsletimFormlariPage: React.FC = () => {
     switch(status) {
       case 'approved': return <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Onaylandı</span>;
       case 'pending': return <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Bekliyor</span>;
+      case 'submitted': return <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Teslim Edildi</span>;
+      case 'pending_revision': return <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">Revize Bekliyor</span>;
+      case 'revised': return <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Revize Edildi</span>;
       case 'rejected': return <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Reddedildi</span>;
-      case 'teslim_edildi': return <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Bankada</span>;
+      case 'teslim_edildi': return <span className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">Bankaya Teslim Edildi</span>;
       default: return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">{status}</span>;
     }
   };

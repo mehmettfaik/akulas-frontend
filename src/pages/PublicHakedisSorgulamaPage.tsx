@@ -277,7 +277,7 @@ export const PublicHakedisSorgulamaPage: React.FC = () => {
                                     <span key={type} className={`px-2 py-0.5 rounded text-xs font-medium ${
                                       type === 'KREDI_KARTI' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'
                                     }`}>
-                                      {type === 'KREDI_KARTI' ? 'CC' : 'HFT'}
+                                      {type === 'KREDI_KARTI' ? 'Kredi Kartı' : 'Hat Bazlı'}
                                     </span>
                                   ))}
                                 </div>

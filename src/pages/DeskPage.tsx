@@ -93,7 +93,7 @@ export const DeskPage: React.FC = () => {
     vize: { b200: 0, b100: 0, b50: 0, b20: 0, b10: 0, b5: 0, c1: 0, c050: 0 },
   });
 
-  const [activeTab, setActiveTab] = useState<'dolum' | 'kart' | 'vize'>('dolum');
+  // activeTab removed (using combined approach)
   const [bankSentCash, setBankSentCash] = useState({ dolum: 0, kart: 0, vize: 0 });
 
   const [loading, setLoading] = useState(false);
@@ -239,12 +239,12 @@ export const DeskPage: React.FC = () => {
     setMessage(null);
 
     try {
-      // Otomatik olarak kupür toplamlarını bankSentCash'e yaz
+      // Otomatik olarak kupür toplamlarını bankSentCash'e yaz (Genel Toplam olarak dolum'a kaydediyoruz)
       const autoBankSentCash = {
         dolum: calculateBanknoteTotal('dolum'),
-        kart: calculateBanknoteTotal('kart'),
-        vize: calculateBanknoteTotal('vize'),
-        totalSent: calculateBanknoteTotal('dolum') + calculateBanknoteTotal('kart') + calculateBanknoteTotal('vize')
+        kart: 0,
+        vize: 0,
+        totalSent: calculateBanknoteTotal('dolum')
       };
       setBankSentCash(autoBankSentCash);
 
@@ -737,196 +737,52 @@ export const DeskPage: React.FC = () => {
 
               {/* Banknot/Kupür Bazlı Para Sayımı */}
               <div className="border-t-2 border-gray-300 pt-6 mt-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Banknot/Kupür Bazlı Para Sayımı</h3>
-
-                {/* Sekmeler */}
-                <div className="flex flex-wrap border-b border-gray-300 mb-4">
-                  <button
-                    className={`px-3 sm:px-6 py-3 font-semibold transition-colors ${
-                      activeTab === 'dolum'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                    onClick={() => setActiveTab('dolum')}
-                  >
-                    DOLUM
-                  </button>
-                  <button
-                    className={`px-3 sm:px-6 py-3 font-semibold transition-colors ${
-                      activeTab === 'kart'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                    onClick={() => setActiveTab('kart')}
-                  >
-                    KART / KART KILIFI
-                  </button>
-                  <button
-                    className={`px-3 sm:px-6 py-3 font-semibold transition-colors ${
-                      activeTab === 'vize'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                    onClick={() => setActiveTab('vize')}
-                  >
-                    VİZE
-                  </button>
+                <div className="flex items-center gap-2 mb-4 text-gray-800">
+                  <h3 className="text-lg font-bold">Banknot/Kupür Bazlı Para Sayımı (Genel Toplam)</h3>
                 </div>
 
                 {/* Nakit Toplam Gösterimi */}
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                   <p className="text-sm text-blue-800">
-                    <strong>Nakit Toplam ({activeTab === 'kart' ? 'KART / KART KILIFI' : activeTab.toUpperCase()}):</strong>{' '}
-                    {activeTab === 'dolum' && formatCurrency(calculateDolumCash())}
-                    {activeTab === 'kart' && formatCurrency(calculateKartCash() + calculateKartKilifiCash())}
-                    {activeTab === 'vize' && formatCurrency(calculateVizeCash())}
+                    <strong>Beklenen Nakit Toplam:</strong>{' '}
+                    {formatCurrency(calculateTotalCategoryCash())}
                   </p>
                 </div>
 
                 {/* Banknot Giriş Alanları */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {/* 200 TL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">200 TL</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        value={banknotes[activeTab].b200 || ''}
-                        onChange={(e) => handleBanknoteChange(activeTab, 'b200', e.target.value)}
-                        placeholder="Adet"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        {formatCurrency(banknotes[activeTab].b200 * 200)}
-                      </span>
-                    </div>
-                  </div>
-                  {/* 100 TL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">100 TL</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        value={banknotes[activeTab].b100 || ''}
-                        onChange={(e) => handleBanknoteChange(activeTab, 'b100', e.target.value)}
-                        placeholder="Adet"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        {formatCurrency(banknotes[activeTab].b100 * 100)}
-                      </span>
-                    </div>
-                  </div>
-                  {/* 50 TL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">50 TL</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        value={banknotes[activeTab].b50 || ''}
-                        onChange={(e) => handleBanknoteChange(activeTab, 'b50', e.target.value)}
-                        placeholder="Adet"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        {formatCurrency(banknotes[activeTab].b50 * 50)}
-                      </span>
-                    </div>
-                  </div>
-                  {/* 20 TL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">20 TL</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        value={banknotes[activeTab].b20 || ''}
-                        onChange={(e) => handleBanknoteChange(activeTab, 'b20', e.target.value)}
-                        placeholder="Adet"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        {formatCurrency(banknotes[activeTab].b20 * 20)}
-                      </span>
-                    </div>
-                  </div>
-                  {/* 10 TL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">10 TL</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        value={banknotes[activeTab].b10 || ''}
-                        onChange={(e) => handleBanknoteChange(activeTab, 'b10', e.target.value)}
-                        placeholder="Adet"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        {formatCurrency(banknotes[activeTab].b10 * 10)}
-                      </span>
-                    </div>
-                  </div>
-                  {/* 5 TL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">5 TL</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        value={banknotes[activeTab].b5 || ''}
-                        onChange={(e) => handleBanknoteChange(activeTab, 'b5', e.target.value)}
-                        placeholder="Adet"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        {formatCurrency(banknotes[activeTab].b5 * 5)}
-                      </span>
-                    </div>
-                  </div>
-                  {/* 1 TL */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">1 TL</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        value={banknotes[activeTab].c1 || ''}
-                        onChange={(e) => handleBanknoteChange(activeTab, 'c1', e.target.value)}
-                        placeholder="Adet"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        {formatCurrency(banknotes[activeTab].c1 * 1)}
-                      </span>
-                    </div>
-                  </div>
-                  {/* 50 Kr */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">50 Kr</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        value={banknotes[activeTab].c050 || ''}
-                        onChange={(e) => handleBanknoteChange(activeTab, 'c050', e.target.value)}
-                        placeholder="Adet"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">
-                        {formatCurrency(banknotes[activeTab].c050 * 0.50)}
-                      </span>
+                <div className="space-y-3">
+                  {[
+                    { key: 'b200', label: '200 TL', multiplier: 200 },
+                    { key: 'b100', label: '100 TL', multiplier: 100 },
+                    { key: 'b50', label: '50 TL', multiplier: 50 },
+                    { key: 'b20', label: '20 TL', multiplier: 20 },
+                    { key: 'b10', label: '10 TL', multiplier: 10 },
+                    { key: 'b5', label: '5 TL', multiplier: 5 },
+                    { key: 'c1', label: '1 TL', multiplier: 1 },
+                    { key: 'c050', label: '50 Kr', multiplier: 0.50 },
+                  ].map((banknote) => {
+                    const count = banknotes.dolum[banknote.key as keyof BanknoteCount] || 0;
+                    const total = count * banknote.multiplier;
+                    return (
+                      <div key={banknote.key} className="flex items-center gap-4">
+                        <div className="w-24 font-medium text-gray-700">{banknote.label}</div>
+                        <input
+                          type="number"
+                          min="0"
+                          className="w-24 px-3 py-2 border border-gray-300 rounded focus:ring-primary-500 focus:border-primary-500 text-center"
+                          value={count || ''}
+                          onChange={(e) => handleBanknoteChange('dolum', banknote.key as keyof BanknoteCount, e.target.value)}
+                        />
+                        <div className="flex-1 text-right font-medium text-gray-900">
+                          {formatCurrency(total)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="pt-4 mt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center text-lg font-bold text-primary-600">
+                      <span>Banknot Sayımı Toplamı:</span>
+                      <span>{formatCurrency(calculateBanknoteTotal('dolum'))}</span>
                     </div>
                   </div>
                 </div>
@@ -935,87 +791,53 @@ export const DeskPage: React.FC = () => {
                 <div className="mt-6 p-4 bg-gray-100 rounded-lg">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <p className="text-sm text-gray-600">Nakit Toplam (Ödeme Dağılımı)</p>
+                      <p className="text-sm text-gray-600">Beklenen Nakit Toplam</p>
                       <p className="text-lg font-bold text-blue-600">
-                        {activeTab === 'dolum' && formatCurrency(calculateDolumCash())}
-                        {activeTab === 'kart' && formatCurrency(calculateKartCash() + calculateKartKilifiCash())}
-                        {activeTab === 'vize' && formatCurrency(calculateVizeCash())}
+                        {formatCurrency(calculateTotalCategoryCash())}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Banknot Sayımı Toplam</p>
-                      <p className="text-lg font-bold text-green-600">{formatCurrency(calculateBanknoteTotal(activeTab))}</p>
+                      <p className="text-lg font-bold text-green-600">{formatCurrency(calculateBanknoteTotal('dolum'))}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Fark</p>
                       <p className={`text-lg font-bold ${
-                        Math.abs(
-                          (activeTab === 'dolum' ? calculateDolumCash() :
-                           activeTab === 'kart' ? (calculateKartCash() + calculateKartKilifiCash()) :
-                           calculateVizeCash()) - calculateBanknoteTotal(activeTab)
-                        ) < 0.01 ? 'text-green-600' : 'text-red-600'
+                        Math.abs(calculateTotalCategoryCash() - calculateBanknoteTotal('dolum')) < 0.01 ? 'text-green-600' : 'text-red-600'
                       }`}>
-                        {formatCurrency(
-                          (activeTab === 'dolum' ? calculateDolumCash() :
-                           activeTab === 'kart' ? (calculateKartCash() + calculateKartKilifiCash()) :
-                           calculateVizeCash()) - calculateBanknoteTotal(activeTab)
-                        )}
+                        {formatCurrency(calculateTotalCategoryCash() - calculateBanknoteTotal('dolum'))}
                       </p>
                     </div>
                   </div>
-                  {Math.abs(
-                    (activeTab === 'dolum' ? calculateDolumCash() :
-                     activeTab === 'kart' ? (calculateKartCash() + calculateKartKilifiCash()) :
-                     calculateVizeCash()) - calculateBanknoteTotal(activeTab)
-                  ) >= 0.01 && (
+                  {Math.abs(calculateTotalCategoryCash() - calculateBanknoteTotal('dolum')) >= 0.01 && (
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
                       <p className="text-sm text-yellow-800">
-                        ⚠️ Uyarı: Nakit toplam ile banknot sayımı uyuşmuyor! Lütfen kontrol edin.
+                        ⚠️ Uyarı: Beklenen nakit toplam ile banknot sayımı uyuşmuyor! Lütfen kontrol edin.
                       </p>
                     </div>
                   )}
-                  {Math.abs(
-                    (activeTab === 'dolum' ? calculateDolumCash() :
-                     activeTab === 'kart' ? (calculateKartCash() + calculateKartKilifiCash()) :
-                     calculateVizeCash()) - calculateBanknoteTotal(activeTab)
-                  ) < 0.01 && (
+                  {Math.abs(calculateTotalCategoryCash() - calculateBanknoteTotal('dolum')) < 0.01 && (
                     <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded">
                       <p className="text-sm text-green-800">
-                        ✓ Nakit toplam ile banknot sayımı uyuşuyor.
+                        ✓ Beklenen nakit toplam ile banknot sayımı uyuşuyor.
                       </p>
                     </div>
                   )}
                 </div>
 
-
-
                 {/* Bankaya Gönderilen Toplam */}
-                {(bankSentCash.dolum > 0 || bankSentCash.kart > 0 || bankSentCash.vize > 0) && (
+                {bankSentCash.dolum > 0 && (
                   <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <h4 className="font-bold text-green-900 mb-3">Bankaya Gönderilen Tutarlar:</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      {bankSentCash.dolum > 0 && (
-                        <div>
-                          <p className="text-sm text-gray-600">DOLUM</p>
-                          <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.dolum)}</p>
-                        </div>
-                      )}
-                      {bankSentCash.kart > 0 && (
-                        <div>
-                          <p className="text-sm text-gray-600">KART</p>
-                          <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.kart)}</p>
-                        </div>
-                      )}
-                      {bankSentCash.vize > 0 && (
-                        <div>
-                          <p className="text-sm text-gray-600">VİZE</p>
-                          <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.vize)}</p>
-                        </div>
-                      )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-600">GENEL TOPLAM</p>
+                        <p className="text-lg font-bold text-green-600">{formatCurrency(bankSentCash.dolum)}</p>
+                      </div>
                       <div>
                         <p className="text-sm text-gray-600">TOPLAM</p>
                         <p className="text-lg font-bold text-green-600">
-                          {formatCurrency(bankSentCash.dolum + bankSentCash.kart + bankSentCash.vize)}
+                          {formatCurrency(bankSentCash.dolum)}
                         </p>
                       </div>
                     </div>

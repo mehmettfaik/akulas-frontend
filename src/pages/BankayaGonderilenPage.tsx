@@ -43,7 +43,8 @@ interface BankSentRecord {
 }
 
 const statusLabels: Record<string, { label: string; className: string }> = {
-  submitted: { label: 'Beklemede', className: 'bg-yellow-100 text-yellow-800' },
+  submitted: { label: 'Teslim Edildi', className: 'bg-blue-100 text-blue-800' },
+  pending: { label: 'Bekliyor', className: 'bg-yellow-100 text-yellow-800' },
   approved: { label: 'Onaylandı', className: 'bg-green-100 text-green-800' },
   rejected: { label: 'Reddedildi', className: 'bg-red-100 text-red-800' },
   pending_revision: { label: 'Revize Bekliyor', className: 'bg-orange-100 text-orange-800' },
@@ -374,7 +375,7 @@ export const BankayaGonderilenPage: React.FC = () => {
           <Card>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">DOLUM</p>
+                <p className="text-sm text-gray-600">GENEL / DOLUM</p>
                 <p className="text-lg md:text-2xl font-bold text-blue-600">{formatCurrency(totals.dolum)}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-blue-600" />
@@ -422,8 +423,8 @@ export const BankayaGonderilenPage: React.FC = () => {
               <div className="text-sm text-gray-500 mt-4 space-y-1">
                 <p>Bankaya gönderilen kayıtların burada görünmesi için:</p>
                 <ul className="list-disc list-inside text-left inline-block mt-2">
-                  <li>Desk İşlemleri veya Bayi Dolum sayfasında kupür sayımını doldurun</li>
-                  <li>"Bankaya Gönder" butonuna tıklayarak tutarı işaretleyin</li>
+                  <li>Desk İşlemleri, Bayi Dolum veya Kiosk Dolum sayfalarında kupür sayımını doldurun</li>
+                  <li>Kupür toplamları üzerinden bankaya gönderilecek nakit otomatik hesaplanır</li>
                   <li><strong>"Sorumluya Teslim Et"</strong> butonuna tıklayarak kaydı gönderin</li>
                 </ul>
               </div>
@@ -445,7 +446,7 @@ export const BankayaGonderilenPage: React.FC = () => {
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tarih</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tip</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Durum</th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Dolum</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Genel / Dolum</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Kart</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Vize</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Toplam</th>
@@ -603,7 +604,7 @@ export const BankayaGonderilenPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {(selectedRecord.bankSentCash.dolum || 0) > 0 && (
                   <div className="bg-blue-50 p-3 rounded-lg text-center">
-                    <p className="text-xs text-blue-600 font-medium">DOLUM</p>
+                    <p className="text-xs text-blue-600 font-medium">GENEL / DOLUM</p>
                     <p className="text-xl font-bold text-blue-700">{formatCurrency(selectedRecord.bankSentCash.dolum)}</p>
                   </div>
                 )}
@@ -626,7 +627,7 @@ export const BankayaGonderilenPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-semibold mb-3 border-b pb-2">Kupür Dökümü</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {renderBanknoteTable('DOLUM', selectedRecord.banknotes.dolum, selectedRecord.bankSentCash.dolum || 0, 'text-blue-700')}
+                    {renderBanknoteTable('GENEL / DOLUM', selectedRecord.banknotes.dolum, selectedRecord.bankSentCash.dolum || 0, 'text-blue-700')}
                     {renderBanknoteTable('KART', selectedRecord.banknotes.kart, selectedRecord.bankSentCash.kart || 0, 'text-purple-700')}
                     {selectedRecord.type === 'desk' && renderBanknoteTable('VİZE', selectedRecord.banknotes.vize, selectedRecord.bankSentCash.vize || 0, 'text-orange-700')}
                   </div>
@@ -657,11 +658,21 @@ export const BankayaGonderilenPage: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">Rol</p>
-                      <p className="font-medium capitalize">{selectedRecord.reviewedByRole}</p>
+                      <p className="font-medium capitalize">
+                        {selectedRecord.reviewedByRole === 'admin' ? 'Yönetici' : 
+                         selectedRecord.reviewedByRole === 'responsible' ? 'Sorumlu' : 
+                         selectedRecord.reviewedByRole}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">İşlem</p>
-                      <p className="font-medium capitalize">{selectedRecord.reviewAction}</p>
+                      <p className="font-medium capitalize">
+                        {selectedRecord.reviewAction === 'approve' ? 'Onay' : 
+                         selectedRecord.reviewAction === 'reject' ? 'Red' : 
+                         selectedRecord.reviewAction === 'revise' ? 'Revize' : 
+                         selectedRecord.reviewAction === 'deliver_to_bank' ? 'Teslimat' : 
+                         selectedRecord.reviewAction}
+                      </p>
                     </div>
                     {selectedRecord.reviewedAt && (
                       <div>
