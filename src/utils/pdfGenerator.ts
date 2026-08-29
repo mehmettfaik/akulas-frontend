@@ -1,8 +1,16 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import type { DeskRecord, BayiDolumRecord } from '../types';
 import type { KioskDolumRecord } from '../services/kioskDolumService';
 import { formatCurrency } from './formatCurrency';
+
+async function loadPdfLibs() {
+  const [jsPDFModule, autoTableModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable')
+  ]);
+  const jsPDF = jsPDFModule.default;
+  const autoTable = autoTableModule.default;
+  return { jsPDF, autoTable };
+}
 
 const formatPdfCurrency = (value: number) => {
   return formatCurrency(value).replace('₺', 'TL');
@@ -35,6 +43,7 @@ const loadImage = (url: string): Promise<string> => {
 };
 
 export const generateDeskPdf = async (record: DeskRecord) => {
+  const { jsPDF, autoTable } = await loadPdfLibs();
   const doc = new jsPDF();
   
   const primaryColor: [number, number, number] = [185, 28, 28]; // Red-700
@@ -188,6 +197,7 @@ export const generateDeskPdf = async (record: DeskRecord) => {
 };
 
 export const generateBayiDolumPdf = async (record: BayiDolumRecord) => {
+  const { jsPDF, autoTable } = await loadPdfLibs();
   const doc = new jsPDF();
   
   const primaryColor: [number, number, number] = [30, 64, 175]; // Blue-800
@@ -318,6 +328,7 @@ export const generateBayiDolumPdf = async (record: BayiDolumRecord) => {
 };
 
 export const generateDailySummaryPdf = async (type: string, date: string, summary: any) => {
+  const { jsPDF, autoTable } = await loadPdfLibs();
   const doc = new jsPDF();
   
   const primaryColor: [number, number, number] = [15, 118, 110]; // Teal-700
@@ -426,6 +437,7 @@ export const generateDailySummaryPdf = async (type: string, date: string, summar
 };
 
 export const generateKioskDolumPdf = async (record: KioskDolumRecord) => {
+  const { jsPDF, autoTable } = await loadPdfLibs();
   const doc = new jsPDF();
   
   const primaryColor: [number, number, number] = [234, 88, 12]; // Orange-600

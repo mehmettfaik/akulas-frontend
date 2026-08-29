@@ -38,6 +38,9 @@ export const kioskDolumService = {
   },
   getSubmitted: async (params?: any) => {
     const response = await apiClient.get('/kiosk-dolum/submitted', { params });
+    if (response.data?.data?.records) {
+      response.data.data = response.data.data.records;
+    }
     return response.data;
   },
   getById: async (id: string) => {

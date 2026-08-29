@@ -110,8 +110,8 @@ export const DeskPage: React.FC = () => {
     try {
       const response = await deskService.getSubmitted({ status: 'pending_revision' });
       setDraftAndRevisedRecords(response.data || []);
-    } catch (error) {
-      // silently ignore fetch error for revised records
+    } catch {
+      // silently ignore
     }
   };
 

@@ -29,15 +29,14 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
+      // Unauthorized - dispatch event to AuthContext
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      window.dispatchEvent(new Event('auth:unauthorized'));
     } else if (error.response?.status === 403) {
       // Forbidden - access denied
       alert('Bu işlem için yetkiniz bulunmamaktadır.');
-      // Ana sayfaya yönlendir
-      window.location.href = '/';
+      window.dispatchEvent(new Event('auth:forbidden'));
     }
     return Promise.reject(error);
   }

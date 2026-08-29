@@ -46,6 +46,7 @@ export const KioskDolumPage: React.FC = () => {
 
   useEffect(() => {
     fetchKiosks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Kiosk değiştiğinde formu sıfırla

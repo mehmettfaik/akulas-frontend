@@ -45,6 +45,7 @@ export const AdminIsletimFormlariPage: React.FC = () => {
 
   useEffect(() => {
     fetchRecords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate]);
 
   const filteredDeskRecords = deskRecords;

@@ -1,0 +1,1 @@
+import{a as s}from"./api-D9AEeNlO.js";const r={getAll:async()=>(await s.get("/vehicles")).data,getById:async e=>(await s.get(`/vehicles/${e}`)).data,create:async e=>(await s.post("/vehicles",e)).data,update:async(e,t)=>(await s.put(`/vehicles/${e}`,t)).data,delete:async e=>(await s.delete(`/vehicles/${e}`)).data};export{r as v};

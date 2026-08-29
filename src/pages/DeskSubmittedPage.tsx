@@ -45,10 +45,14 @@ export const DeskSubmittedPage: React.FC = () => {
       ]);
 
       // Birleştir ve tip ekle
+      const deskRecords = Array.isArray(deskRes.data.data) ? deskRes.data.data : (deskRes.data.data?.records || []);
+      const bayiRecords = Array.isArray(bayiRes.data.data) ? bayiRes.data.data : (bayiRes.data.data?.records || []);
+      const kioskRecords = Array.isArray(kioskRes.data.data) ? kioskRes.data.data : (kioskRes.data.data?.records || []);
+
       const allRecords: CombinedRecord[] = [
-        ...(deskRes.data.data || []).map((r: DeskRecord) => ({ ...r, recordType: 'desk' as const })),
-        ...(bayiRes.data.data || []).map((r: BayiDolumRecord) => ({ ...r, recordType: 'bayi' as const })),
-        ...(kioskRes.data.data || []).map((r: KioskDolumRecord) => ({ ...r, recordType: 'kiosk' as const }))
+        ...deskRecords.map((r: DeskRecord) => ({ ...r, recordType: 'desk' as const })),
+        ...bayiRecords.map((r: BayiDolumRecord) => ({ ...r, recordType: 'bayi' as const })),
+        ...kioskRecords.map((r: KioskDolumRecord) => ({ ...r, recordType: 'kiosk' as const }))
       ];
 
       // Tarihe göre sırala (en yeni önce)

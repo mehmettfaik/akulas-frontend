@@ -95,7 +95,7 @@ export const BayiDolumPage: React.FC = () => {
     try {
       const response = await bayiDolumService.getSubmitted({ status: 'pending_revision' });
       setRevisedRecords(response.data || []);
-    } catch (error) {
+    } catch {
       // silently ignore fetch error for revised records
     }
   };

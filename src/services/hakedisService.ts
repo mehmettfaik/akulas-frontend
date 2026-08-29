@@ -9,6 +9,9 @@ export const hakedisService = {
 
   getAll: async (): Promise<ApiResponse<HakedisRecord[]>> => {
     const response = await apiClient.get('/hakedis');
+    if (response.data?.data?.records) {
+      response.data.data = response.data.data.records;
+    }
     return response.data;
   },
 

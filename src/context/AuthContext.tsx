@@ -11,6 +11,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -35,13 +36,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (storedUser && token) {
       try {
         setUser(JSON.parse(storedUser));
-      } catch (error) {
+      } catch {
         localStorage.removeItem('user');
         localStorage.removeItem('authToken');
       }
     }
-    
     setLoading(false);
+
+    const handleUnauthorized = () => {
+      setUser(null);
+    };
+
+    const handleForbidden = () => {
+      // In a more complex app, you might set an error state here, but for now we just rely on ProtectedRoute logic 
+      // or we could force a redirect by resetting state if we want, but usually forbidden just means access denied on an action.
+      // If we wanted to forcefully send them to home on a page load forbidden, we could.
+      // For now, removing user is not right for forbidden (403), because they are still logged in.
+      // So we can just leave it to the alert/UI components or navigate them if we had access to router.
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    window.addEventListener('auth:forbidden', handleForbidden);
+
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+      window.removeEventListener('auth:forbidden', handleForbidden);
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

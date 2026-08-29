@@ -71,6 +71,9 @@ export const deskService = {
   // Teslim edilen kayıtları listele
   getSubmitted: async (params?: { startDate?: string; endDate?: string; status?: string }) => {
     const response = await apiClient.get('/desk/submitted', { params });
+    if (response.data?.data?.records) {
+      response.data.data = response.data.data.records;
+    }
     return response.data;
   },
 

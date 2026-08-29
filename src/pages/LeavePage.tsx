@@ -375,6 +375,7 @@ const LeaveRequestsTab: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterEmployee, filterStatus, filterYear]);
 
   const fetchData = async () => {
@@ -701,6 +702,7 @@ const LeaveSummaryTab: React.FC = () => {
 
   useEffect(() => {
     fetchSummary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterYear]);
 
   const fetchSummary = async () => {
