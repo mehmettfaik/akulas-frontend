@@ -5,24 +5,13 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://akulas-back
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor to add JWT token from localStorage
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
-);
+// Removed request interceptor that adds JWT token from localStorage
 
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
@@ -30,8 +19,6 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Unauthorized - dispatch event to AuthContext
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
       window.dispatchEvent(new Event('auth:unauthorized'));
     } else if (error.response?.status === 403) {
       // Forbidden - access denied

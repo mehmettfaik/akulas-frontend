@@ -342,7 +342,7 @@ export const generateBayiDolumPdf = async (record: BayiDolumRecord) => {
   doc.save(`bayi_dolum_formu_${record.id?.substring(0,8) || 'yeni'}.pdf`);
 };
 
-export const generateDailySummaryPdf = async (type: string, date: string, summary: any) => {
+export const generateDailySummaryPdf = async (type: string, date: string, summary: { totalSales: number; totalCreditCard: number; totalCash: number; difference: number }) => {
   const { jsPDF, autoTable } = await loadPdfLibs();
   const doc = new jsPDF();
   doc.addFileToVFS('Roboto-Regular.ttf', RobotoRegular);

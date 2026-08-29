@@ -8,12 +8,16 @@ import { deskService } from '../services/deskService';
 import { bayiDolumService } from '../services/bayiDolumService';
 import { kioskDolumService } from '../services/kioskDolumService';
 import { getErrorMessage } from '../utils/errorHandler';
+import type { DeskRecord, BayiDolumRecord } from '../types';
+import type { KioskDolumRecord } from '../services/kioskDolumService';
+
+type IsletimRecord = DeskRecord | BayiDolumRecord | KioskDolumRecord;
 
 export const AdminIsletimFormlariPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'desk' | 'bayi' | 'kiosk'>('desk');
-  const [deskRecords, setDeskRecords] = useState<any[]>([]);
-  const [bayiRecords, setBayiRecords] = useState<any[]>([]);
-  const [kioskRecords, setKioskRecords] = useState<any[]>([]);
+  const [deskRecords, setDeskRecords] = useState<DeskRecord[]>([]);
+  const [bayiRecords, setBayiRecords] = useState<BayiDolumRecord[]>([]);
+  const [kioskRecords, setKioskRecords] = useState<KioskDolumRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -52,7 +56,7 @@ export const AdminIsletimFormlariPage: React.FC = () => {
   const filteredBayiRecords = bayiRecords;
   const filteredKioskRecords = kioskRecords;
 
-  const calculateSummary = (records: any[]) => {
+  const calculateSummary = (records: IsletimRecord[]) => {
     let totalSales = 0;
     let totalCreditCard = 0;
     let totalCash = 0;
@@ -87,7 +91,7 @@ export const AdminIsletimFormlariPage: React.FC = () => {
     }
   };
 
-  const renderTable = (records: any[], type: 'desk'|'bayi'|'kiosk') => (
+  const renderTable = (records: IsletimRecord[], type: 'desk'|'bayi'|'kiosk') => (
     <table className="w-full text-left border-collapse">
       <thead>
         <tr className="bg-gray-50 text-gray-700 text-sm border-b">
@@ -113,7 +117,7 @@ export const AdminIsletimFormlariPage: React.FC = () => {
                   {new Date(record.date).toLocaleDateString('tr-TR')}
                 </div>
               </td>
-              {type === 'kiosk' && <td className="py-3 px-4 text-left font-medium">{record.kioskName}</td>}
+              {type === 'kiosk' && <td className="py-3 px-4 text-left font-medium">{(record as KioskDolumRecord).kioskName}</td>}
               <td className="py-3 px-4 text-right">{formatCurrency(record.totals.totalSales)}</td>
               <td className="py-3 px-4 text-right text-orange-600">{formatCurrency(record.totals.totalCreditCard)}</td>
               <td className="py-3 px-4 text-right text-green-600">{formatCurrency(record.totals.totalCash)}</td>
@@ -129,11 +133,11 @@ export const AdminIsletimFormlariPage: React.FC = () => {
                 <button
                   onClick={() => {
                     if (type === 'desk') {
-                      generateDeskPdf(record);
+                      generateDeskPdf(record as DeskRecord);
                     } else if (type === 'bayi') {
-                      generateBayiDolumPdf(record);
+                      generateBayiDolumPdf(record as BayiDolumRecord);
                     } else {
-                      generateKioskDolumPdf(record);
+                      generateKioskDolumPdf(record as KioskDolumRecord);
                     }
                   }}
                   className="inline-flex items-center px-2 py-1 bg-white border border-gray-300 rounded text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"

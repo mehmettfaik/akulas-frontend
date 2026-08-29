@@ -32,11 +32,11 @@ export interface KioskDolumRecord {
 }
 
 export const kioskDolumService = {
-  submit: async (data: any) => {
+  submit: async (data: KioskDolumRecord) => {
     const response = await apiClient.post('/kiosk-dolum/submit', data);
     return response.data;
   },
-  getSubmitted: async (params?: any) => {
+  getSubmitted: async (params?: Record<string, string | number | undefined>) => {
     const response = await apiClient.get('/kiosk-dolum/submitted', { params });
     if (response.data?.data?.records) {
       response.data.data = response.data.data.records;
@@ -51,7 +51,7 @@ export const kioskDolumService = {
     const response = await apiClient.post(`/kiosk-dolum/${id}/review`, { status, notes });
     return response.data;
   },
-  update: async (id: string, data: any) => {
+  update: async (id: string, data: Partial<KioskDolumRecord>) => {
     const response = await apiClient.put(`/kiosk-dolum/${id}`, data);
     return response.data;
   },

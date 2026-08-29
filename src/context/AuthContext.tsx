@@ -29,19 +29,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // localStorage'dan kullanıcıyı kontrol et
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('authToken');
-    
-    if (storedUser && token) {
+    const verifyUser = async () => {
       try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        localStorage.removeItem('user');
-        localStorage.removeItem('authToken');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'https://akulas-backend.onrender.com/api/v1'}/auth/verify`, {
+          withCredentials: true
+        });
+        if (response.data.success) {
+          setUser(response.data.data);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-    }
-    setLoading(false);
+    };
+
+    verifyUser();
 
     const handleUnauthorized = () => {
       setUser(null);
@@ -71,12 +76,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await axios.post(`${apiUrl}/auth/login`, {
         email,
         password
+      }, {
+        withCredentials: true
       });
 
       if (response.data.success) {
-        // JWT token'ı kaydet
-        localStorage.setItem('authToken', response.data.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        // Clear any old local storage items just in case
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
         
         setUser(response.data.data.user);
       } else {
@@ -91,9 +98,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signOut = async () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    setUser(null);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://akulas-backend.onrender.com/api/v1';
+      await axios.post(`${apiUrl}/auth/logout`, {}, { withCredentials: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      setUser(null);
+    }
   };
 
   const value: AuthContextType = {
