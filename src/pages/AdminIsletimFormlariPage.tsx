@@ -127,7 +127,7 @@ export const AdminIsletimFormlariPage: React.FC = () => {
                 </span>
               </td>
               <td className="py-3 px-4 text-center">
-                {getStatusBadge(record.status)}
+                {getStatusBadge(record.status || '')}
               </td>
               <td className="py-3 px-4 text-center">
                 <button
