@@ -90,11 +90,7 @@ export const KioskDolumPage: React.FC = () => {
         kioskName: selectedKiosk?.name || 'Bilinmeyen Kiosk',
         products,
         categoryCreditCards,
-        payments: {
-          gunbasiNakit: payments.gunbasiNakit,
-          bankayaGonderilen: payments.bankayaGonderilen,
-          ertesiGuneBirakilan: payments.ertesiGuneBirakilan
-        },
+        payments,
         banknotes,
         bankSentCash: {
           dolum: sayilanNakit,
