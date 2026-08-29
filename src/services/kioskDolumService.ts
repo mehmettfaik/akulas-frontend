@@ -32,7 +32,7 @@ export interface KioskDolumRecord {
 }
 
 export const kioskDolumService = {
-  submit: async (data: KioskDolumRecord) => {
+  submit: async (data: Omit<KioskDolumRecord, 'id' | 'totals' | 'status' | 'submittedBy' | 'submittedByEmail' | 'submittedAt' | 'reviewedByEmail' | 'reviewedByRole' | 'reviewAction' | 'reviewedAt' | 'reviewNotes'>) => {
     const response = await apiClient.post('/kiosk-dolum/submit', data);
     return response.data;
   },

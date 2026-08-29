@@ -1,4 +1,4 @@
-import axios, { type InternalAxiosRequestConfig, type AxiosError } from 'axios';
+import axios, { type AxiosError } from 'axios';
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://akulas-backend.onrender.com/api/v1';
 
